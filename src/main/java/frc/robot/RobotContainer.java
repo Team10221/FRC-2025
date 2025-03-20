@@ -6,6 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.AlgaeManipulator;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -18,12 +21,23 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  public SwerveSubsystem swerve;
+  public VisionSubsystem vision;
+  public AlgaeManipulator algaeManipulator;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     configureBindings();
+    try { this.swerve = new SwerveSubsystem(); }
+    catch (Exception e) {
+      System.err.println("YAGSL failed to read our drivetrain swerve configuration! D:");
+      e.printStackTrace();
+      System.exit(-1);
+    }
+    this.vision = new VisionSubsystem(swerve);
+    this.algaeManipulator = new AlgaeManipulator();
   }
 
   /**
