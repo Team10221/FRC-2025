@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,6 +11,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import swervelib.SwerveDrive;
@@ -19,9 +22,10 @@ public class SwerveSubsystem extends SubsystemBase {
     protected SwerveDrive swerveDrive;
     protected File swerveJsonDir;
     protected double maximumSpeed;
-    
+
     public SwerveSubsystem() throws IOException {
-        this(Constants.SwerveDriveConstants.SWERVE_JSON_DIRECTORY, Constants.SwerveDriveConstants.MAXIMUM_DRIVETRAIN_SPEED);
+        this(Constants.SwerveDriveConstants.SWERVE_JSON_DIRECTORY,
+                Constants.SwerveDriveConstants.MAXIMUM_DRIVETRAIN_SPEED);
     }
 
     public SwerveSubsystem(File swerveDir, double maxSpeed) throws IOException {
@@ -29,7 +33,6 @@ public class SwerveSubsystem extends SubsystemBase {
         this.maximumSpeed = maxSpeed;
         this.swerveDrive = new SwerveParser(swerveDir).createSwerveDrive(maxSpeed);
     }
-
     public void stop() {
         swerveDrive.drive(new ChassisSpeeds(0D, 0D, 0D));
     }
@@ -58,7 +61,15 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveDrive.getOdometryHeading();
     }
 
-    public double getMaxSpeed() { return maximumSpeed; }
-    public File getSwerveJsonDir() { return swerveJsonDir; }
-    public SwerveDrive getSwerveDriveObject() { return swerveDrive; }
+    public double getMaxSpeed() {
+        return maximumSpeed;
+    }
+
+    public File getSwerveJsonDir() {
+        return swerveJsonDir;
+    }
+
+    public SwerveDrive getSwerveDriveObject() {
+        return swerveDrive;
+    }
 }
