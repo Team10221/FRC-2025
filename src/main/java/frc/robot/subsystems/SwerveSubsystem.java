@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,10 +10,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.SwerveDriveConstants;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 
@@ -24,8 +21,8 @@ public class SwerveSubsystem extends SubsystemBase {
     protected double maximumSpeed;
 
     public SwerveSubsystem() throws IOException {
-        this(Constants.SwerveDriveConstants.SWERVE_JSON_DIRECTORY,
-                Constants.SwerveDriveConstants.MAXIMUM_DRIVETRAIN_SPEED);
+        this(SwerveDriveConstants.SWERVE_JSON_DIRECTORY,
+                SwerveDriveConstants.MAXIMUM_DRIVETRAIN_SPEED);
     }
 
     public SwerveSubsystem(File swerveDir, double maxSpeed) throws IOException {
@@ -71,5 +68,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public SwerveDrive getSwerveDriveObject() {
         return swerveDrive;
+    }
+
+    public void zeroGyro() {
+        swerveDrive.zeroGyro();
+    }
+
+    public void lockPose() {
+        swerveDrive.lockPose();
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        swerveDrive.resetOdometry(pose);
     }
 }

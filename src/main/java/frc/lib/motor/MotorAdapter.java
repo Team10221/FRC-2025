@@ -3,7 +3,9 @@ package frc.lib.motor;
 import frc.lib.motor.Motor.Control;
 import frc.lib.util.PID;
 
-public interface MotorAdapter {
+public interface MotorAdapter<T> {
+    void stop();
+    void set(double speed);
     void resetEncoder();
     void setPID(PID pid);
     void setInverted(boolean toInvert);
@@ -16,5 +18,6 @@ public interface MotorAdapter {
     double getVelocity();
     double getVoltage();
     boolean isInverted();
-    default void setStatorCurrentLimit(double limit) {};
+    T getMotorController();
+    default void useExternalEncoder() {};
 }

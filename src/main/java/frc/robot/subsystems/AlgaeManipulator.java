@@ -2,27 +2,34 @@ package frc.robot.subsystems;
 
 import frc.lib.motor.Motor;
 import frc.lib.subsystem.Subsystem;
-import frc.robot.Constants.AlgaeManipulatorConstants;
-import frc.robot.Constants.AlgaeManipulatorConstants.ManipulatorState;
-import frc.robot.Constants.AlgaeManipulatorConstants.AngleState;
+import frc.robot.Constants.AlgaeManipConstants;
+import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
+import frc.robot.Constants.AlgaeManipConstants.AlgaeManipAngleState;
 
 public class AlgaeManipulator extends Subsystem<Double> {
-  private final Motor leftMotor = Motor.neo(AlgaeManipulatorConstants.LEFT_MOTOR_ID);
-  private final Motor rightMotor = Motor.neo(AlgaeManipulatorConstants.RIGHT_MOTOR_ID);
-  private final Motor angleMotor = Motor.neo(AlgaeManipulatorConstants.ANGLE_MOTOR_ID)
-      .setPID(AlgaeManipulatorConstants.ANGLE_MOTOR_PID);
+  private final Motor leftMotor = Motor.nova(AlgaeManipConstants.LEFT_MOTOR_ID);
+  private final Motor rightMotor = Motor.nova(AlgaeManipConstants.RIGHT_MOTOR_ID);
+  private final Motor angleMotor = Motor.neo(AlgaeManipConstants.ANGLE_MOTOR_ID)
+      .setPID(AlgaeManipConstants.ANGLE_MOTOR_PID)
+      .useExternalEncoder();
 
   public AlgaeManipulator() {
-    super(ManipulatorState.class, AngleState.class);
+    super(AlgaeManipState.class, AlgaeManipAngleState.class);
   }
 
   public void updateMotors() {
-    leftMotor.set(getState(ManipulatorState.class).leftMotorSpeed);
-    rightMotor.set(getState(ManipulatorState.class).rightMotorSpeed);
-    angleMotor.setRef(getState(AngleState.class).position);
+    leftMotor.set(getState(AlgaeManipState.class).leftMotorSpeed);
+    rightMotor.set(getState(AlgaeManipState.class).rightMotorSpeed);
+    angleMotor.setRef(getState(AlgaeManipAngleState.class).position);
   }
 
   public boolean isAtTarget() {
-    return angleMotor.isAtTarget(getState(AngleState.class).position);
+    return angleMotor.isAtTarget(getState(AlgaeManipAngleState.class).position);
+  }
+
+  public void stop() {
+    leftMotor.stop();
+    rightMotor.stop();
+    angleMotor.stop();
   }
 }

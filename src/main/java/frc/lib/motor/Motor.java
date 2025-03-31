@@ -5,8 +5,8 @@ import java.util.function.Consumer;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.thethriftybot.ThriftyNova;
 
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import frc.lib.motor.adapters.SparkMaxAdapter;
 import frc.lib.motor.adapters.TalonFXAdapter;
 import frc.lib.util.PID;
@@ -18,8 +18,7 @@ public class Motor {
   private double threshold;
 
   private PID pid;
-  private MotorAdapter adapter;
-  private MotorController motor;
+  private MotorAdapter<?> adapter;
 
   /**
    * An enum for common types of motor control: position, velocity, voltage.
@@ -36,36 +35,10 @@ public class Motor {
    * @param motor   The motor controller, either a talon fx or spark max/flex.
    * @param adapter The motor adapter, either SparkBaseAdapter or TalonFXAdapter.
    */
-  private Motor(MotorController motor, MotorAdapter adapter) {
-    this.motor = motor;
+  private Motor(MotorAdapter<?> adapter) {
     this.adapter = adapter;
     setThreshold(0.05);
   }
-
-  /**
-   * Creates a kraken Motor without a specified CAN BUS.
-   * 
-   * @param id The motor's CAN ID.
-   * @return The constructed motor object.
-   */
-  /*
-  public static Motor kraken(int id) {
-    TalonFX kraken = new TalonFX(id);
-    return new Motor(kraken, new TalonFXAdapter(kraken));
-  } */
-
-  /**
-   * Creates a kraken Motor with a specified CAN BUS.
-   * 
-   * @param id     The motor's CAN ID.
-   * @param CANBus The motor's CAN BUS.
-   * @return The constructed motor object.
-   */
-  /*
-  public static Motor kraken(int id, String CANBus) {
-    TalonFX kraken = new TalonFX(id, CANBus);
-    return new Motor(kraken, new TalonFXAdapter(kraken));
-  } */
 
   /**
    * Creates a falcon Motor without a specified CAN BUS.
@@ -73,11 +46,11 @@ public class Motor {
    * @param id The motor's CAN ID.
    * @return The constructed motor object.
    */
-  /*
+
   public static Motor falcon(int id) {
     TalonFX falcon = new TalonFX(id);
-    return new Motor(falcon, new TalonFXAdapter(falcon));
-  } */
+    return new Motor(new TalonFXAdapter(falcon));
+  }
 
   /**
    * Creates a falcon Motor with a specified CAN BUS.
@@ -86,11 +59,10 @@ public class Motor {
    * @param CANBus The motor's CAN BUS.
    * @return The constructed motor object.
    */
-  /*
   public static Motor falcon(int id, String CANBus) {
     TalonFX falcon = new TalonFX(id, CANBus);
-    return new Motor(falcon, new TalonFXAdapter(falcon));
-  } */
+    return new Motor(new TalonFXAdapter(falcon));
+  }
 
   /**
    * Creates a neo Motor.
@@ -100,7 +72,18 @@ public class Motor {
    */
   public static Motor neo(int id) {
     SparkMax neo = new SparkMax(id, MotorType.kBrushless);
-    return new Motor(neo, new SparkMaxAdapter(neo));
+    return new Motor(new SparkMaxAdapter(neo));
+  }
+
+  public static Motor nova(int id) {
+    try (ThriftyNova nova = new ThriftyNova(id, ThriftyNova.MotorType.NEO)) {
+      return new Motor(null);
+    } catch (Exception e) {
+      System.err.println("Error with thrifty nova object instantiation!");
+      e.printStackTrace();
+      System.exit(1);
+    }
+    return null;
   }
 
   /**
@@ -110,8 +93,8 @@ public class Motor {
    * @param config The lambda function, as a consumer.
    * @return The motor object, allowing for method chaining.
    */
-  public Motor config(Consumer<MotorController> config) {
-    config.accept(motor);
+  public Motor config(Consumer<Object> config) {
+    config.accept(adapter.getMotorController());
     return this;
   }
 
@@ -121,7 +104,7 @@ public class Motor {
    * @return The current motor controller's name.
    */
   public String getType() {
-    return motor.getClass().getName();
+    return adapter.getMotorController().getClass().getName();
   }
 
   /**
@@ -131,7 +114,7 @@ public class Motor {
    * @return The motor object, allowing for method chaining.
    */
   public Motor set(double speed) {
-    motor.set(speed);
+    adapter.set(speed);
     return this;
   }
 
@@ -177,7 +160,7 @@ public class Motor {
    * @return The motor object, allowing for method chaining.
    */
   public Motor setRef(double reference, Control controlType) {
-    return setRef(reference, controlType);
+    return setReference(reference, controlType);
   }
 
   /**
@@ -224,14 +207,14 @@ public class Motor {
      */
     switch (controlType) {
       case VELOCITY -> {
-        motor.set(pid.toPIDController().calculate(getVelocity(), reference));
+        set(pid.toPIDController().calculate(getVelocity(), reference));
       }
       case POSITION -> {
         // motor.set(pid.toPIDController().calculate(getPosition(), reference));
         // I'm not sure the above is correct?
       }
       case VOLTAGE -> {
-        motor.setVoltage(pid.toPIDController().calculate(getVoltage(), reference));
+        // motor.setVoltage(pid.toPIDController().calculate(getVoltage(), reference));
       }
     }
     return this;
@@ -287,7 +270,7 @@ public class Motor {
    * 
    * @return The motor's adapter.
    */
-  public MotorAdapter getAdapter() {
+  public MotorAdapter<?> getAdapter() {
     return adapter;
   }
 
@@ -326,17 +309,6 @@ public class Motor {
   }
 
   /**
-   * Sets a stator current limit on the motor.
-   * 
-   * @param val The stator current limit.
-   * @return The motor object, allowing for method chaining.
-   */
-  public Motor setStatorCurrentLimit(double val) {
-    adapter.setStatorCurrentLimit(val);
-    return this;
-  }
-
-  /**
    * States whether the motor is at a specified target.
    * 
    * @param target The target.
@@ -358,15 +330,6 @@ public class Motor {
   }
 
   /**
-   * Gets the motor controller object itself.
-   * 
-   * @return The motor controller object.
-   */
-  public MotorController motor() {
-    return motor;
-  }
-
-  /**
    * Gets the motor's PID.
    * 
    * @return The motor's PID.
@@ -376,10 +339,19 @@ public class Motor {
   }
 
   /**
+   * Uses a connected external encoder (in the case of REV Robotics motor controllers).
+   * 
+   * @return The motor object, allowing for method chaining.
+   */
+  public Motor useExternalEncoder() {
+    adapter.useExternalEncoder();
+    return this;
+  }
+
+  /**
    * Stops the motor.
    */
   public void stop() {
-    motor.stopMotor();
-    motor.stopMotor();
+    adapter.stop(); 
   }
 }

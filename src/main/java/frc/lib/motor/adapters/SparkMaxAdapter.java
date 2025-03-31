@@ -15,9 +15,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 
-public class SparkMaxAdapter implements MotorAdapter {
+public class SparkMaxAdapter implements MotorAdapter<SparkMax> {
   private SparkMax motor;
   private SparkMaxConfig config;
+  private boolean usingExternalEncoder = false;
 
   public SparkMaxAdapter(SparkMax motor) {
     this.motor = motor;
@@ -44,11 +45,15 @@ public class SparkMaxAdapter implements MotorAdapter {
   }
 
   public double getPosition() {
-    return motor.getEncoder().getPosition();
+    return usingExternalEncoder 
+      ? motor.getAbsoluteEncoder().getPosition()
+      : motor.getEncoder().getPosition(); 
   }
 
   public double getVelocity() {
-    return motor.getEncoder().getVelocity();
+    return usingExternalEncoder 
+      ? motor.getAbsoluteEncoder().getVelocity()
+      : motor.getEncoder().getVelocity(); 
   }
 
   public double getVoltage() {
@@ -94,5 +99,21 @@ public class SparkMaxAdapter implements MotorAdapter {
 
   private void configure(SparkBaseConfig config) {
     motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+  }
+  
+  public void stop() {
+    motor.stopMotor();
+  }
+
+  public SparkMax getMotorController() {
+    return motor;
+  }
+
+  public void useExternalEncoder() {
+    usingExternalEncoder = true;
+  }
+
+  public void set(double speed) {
+    motor.set(speed);
   }
 }
