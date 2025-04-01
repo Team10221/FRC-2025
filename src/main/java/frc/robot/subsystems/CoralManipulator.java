@@ -8,9 +8,11 @@ import frc.robot.Constants.CoralManipConstants;
 
 public class CoralManipulator extends Subsystem<Double> {
     private final Motor pivotMotor = Motor.neo(CoralManipConstants.ANGLE_MOTOR_ID)
+        .setCurrentLimit(CoralManipConstants.PIVOT_CURRENT_LIMIT)
         .setPID(CoralManipConstants.ANGLE_MOTOR_PID)
         .useExternalEncoder();
-    private final Motor mechanismMotor = Motor.falcon(CoralManipConstants.MANIP_MOTOR_ID);
+    private final Motor mechanismMotor = Motor.falcon(CoralManipConstants.MANIP_MOTOR_ID)
+        .setCurrentLimit(CoralManipConstants.MANIP_CURRENT_LIMIT);
 
     public CoralManipulator() {
         super(CoralManipState.class, CoralManipAngleState.class);

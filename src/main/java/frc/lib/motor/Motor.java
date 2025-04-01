@@ -87,14 +87,14 @@ public class Motor {
   }
 
   /**
-   * Allows use of a lambda function to access and configure the motor controller
+   * Allows use of a lambda function to access and configure the motor adapter 
    * object directly.
    * 
    * @param config The lambda function, as a consumer.
    * @return The motor object, allowing for method chaining.
    */
-  public Motor config(Consumer<Object> config) {
-    config.accept(adapter.getMotorController());
+  public Motor config(Consumer<MotorAdapter<?>> config) {
+    config.accept(adapter);
     return this;
   }
 
