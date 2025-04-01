@@ -7,6 +7,8 @@ package frc.robot;
 import java.io.File;
 
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -32,6 +34,26 @@ public final class Constants {
         public static final CameraConfiguration[] CAMERAS = {
             new CameraConfiguration("FRONT", null) // (main) camera, probably lol
         };
+    }
+
+    public final class ElevatorConstants {
+        public static final int MAIN_MOTOR_ID = 69;
+        public static final int OTHER_MOTOR_ID_THAT_WILL_BE_INVERTED_SOMEHOW = -420;
+        public static final double ENCODER_TICKS_PER_METER = 10D;
+
+        public static final PIDController ELEVATOR_MOTOR_PID = new PIDController(0, 0, 0);
+        public static final ElevatorFeedforward ELEVATOR_FEEDFORWARD = new ElevatorFeedforward(
+            /* kS, kG, kV */
+            0, 0, 0
+        );
+
+        public static enum ElevatorPosition {
+            BOTTOM(0), TOP(1);
+
+            protected double position;
+            ElevatorPosition(double pos) { position = pos; }
+            public double getPosition() { return position; } 
+        }
     }
 
     public final class SwerveDriveConstants {
