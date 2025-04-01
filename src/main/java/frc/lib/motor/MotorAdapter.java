@@ -6,6 +6,7 @@ import frc.lib.util.PID;
 public interface MotorAdapter<T> {
     void stop();
     void set(double speed);
+    void setVolts(double volts);
     void resetEncoder();
     void setPID(PID pid);
     void setInverted(boolean toInvert);

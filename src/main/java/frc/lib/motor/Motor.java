@@ -1,5 +1,6 @@
 package frc.lib.motor;
 
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -115,6 +116,17 @@ public class Motor {
    */
   public Motor set(double speed) {
     adapter.set(speed);
+    return this;
+  }
+
+  /**
+   * Sets the speed of the motor based on the given voltage.
+   * 
+   * @param voltage The amount of volts to put through the motor
+   * @return The motor object, allowing for method chaining.
+   */
+  public Motor setVolts(double voltage) {
+    adapter.setVolts(voltage);
     return this;
   }
 
