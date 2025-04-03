@@ -37,7 +37,7 @@ public final class Constants {
     public final class SwerveDriveConstants {
         // yo uh i pulled this from https://www.chiefdelphi.com/t/yagsl-working-configurations/492586/9 btw
         // (aka https://github.com/frc457/EverybotSwerveYAGSL/tree/main/src/main/deploy/swerve/maxSwerve/modules)
-        public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve");
+        public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve/maxSwerve");
         public static final double MAXIMUM_DRIVETRAIN_SPEED = Units.feetToMeters(14.63);
         // SHEESH
         // w work eddie
@@ -122,6 +122,18 @@ public final class Constants {
             public final double height;
             ElevatorState(double height) {
                 this.height = height;
+            }
+        }
+    }
+
+    public final class MotorTestConstants {
+        public static final double elevatorSpeed = 0.6;
+        public static enum MotorTestState {
+            REST(0), FORWARD(elevatorSpeed), REVERSE(-elevatorSpeed);
+
+            public final double speed;
+            MotorTestState(double speed) {
+                this.speed = speed;
             }
         }
     }
