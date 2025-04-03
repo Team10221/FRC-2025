@@ -25,14 +25,12 @@ import frc.robot.Constants.MotorTestConstants.MotorTestState;
 
 public class RobotContainer {
   public SwerveSubsystem swerve;
-  public MotorTest motorTest;
   // public VisionSubsystem vision;
   // public AlgaeManipulator algaeManipulator;
   // public CoralManipulator coralManipulator;
   // public Elevator elevator;
 
-  // public PS4Controller primary, secondary;
-  public Joystick primary;
+  public PS4Controller primary;
 
   public RobotContainer() {
     try { this.swerve = new SwerveSubsystem(); }
@@ -46,10 +44,9 @@ public class RobotContainer {
     // this.coralManipulator = new CoralManipulator();
     // this.elevator = new Elevator();
 
-    // this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT); 
+    this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT); 
     // this.secondary = new PS4Controller(ControllerConstants.SECONDARY_PORT);
-    this.primary = new Joystick(ControllerConstants.PRIMARY_PORT);
-    this.motorTest = new MotorTest();
+    // this.primary = new Joystick(ControllerConstants.PRIMARY_PORT);
     
     configureBindings();
 
@@ -57,14 +54,14 @@ public class RobotContainer {
       new RunCommand(
         () -> {
           // get speeds & apply deadbands
-          /*
           double xSpeed = -MathUtil.applyDeadband(primary.getLeftY(), ControllerConstants.DEADBAND);
           double ySpeed = -MathUtil.applyDeadband(primary.getLeftX(), ControllerConstants.DEADBAND);
           double rotSpeed = -MathUtil.applyDeadband(primary.getRightX(), ControllerConstants.DEADBAND);
-          */
+          /*
           double xSpeed = -MathUtil.applyDeadband(primary.getRawAxis(1), ControllerConstants.DEADBAND);
           double ySpeed = -MathUtil.applyDeadband(primary.getRawAxis(0), ControllerConstants.DEADBAND);
           double rotSpeed = -MathUtil.applyDeadband(primary.getRawAxis(4), ControllerConstants.DEADBAND);
+          */
 
           // square speeds for better control
           xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
@@ -88,6 +85,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    /* 
     new JoystickButton(primary, 1) // A
       .whileTrue(new InstantCommand(() -> motorTest.setState(MotorTestState.FORWARD)))
       .onFalse(new InstantCommand(() -> motorTest.setState(MotorTestState.REST)));
@@ -95,6 +93,7 @@ public class RobotContainer {
     new JoystickButton(primary, 2) // B
       .whileTrue(new InstantCommand(() -> motorTest.setState(MotorTestState.REVERSE)))
       .onFalse(new InstantCommand(() -> motorTest.setState(MotorTestState.REST)));
+    */
     // primary controls
     /*
     new JoystickButton(primary, PS4Controller.Button.kTriangle.value)

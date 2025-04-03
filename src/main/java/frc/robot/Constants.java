@@ -64,7 +64,7 @@ public final class Constants {
         }
 
         public static enum AlgaeManipState {
-            INTAKE(1, -1), RELEASE(-0.5, 0.5), IDLE(0, 0);
+            IDLE(0, 0), INTAKE(1, -1), RELEASE(-0.5, 0.5);
 
             public final double leftMotorSpeed, rightMotorSpeed;
 
@@ -94,7 +94,7 @@ public final class Constants {
         }
 
         public static enum CoralManipState {
-            INTAKE(0), OUTTAKE(0), REST(0);
+            REST(0), INTAKE(0), OUTTAKE(0), HOLD(0);
 
             public final double speed;
             CoralManipState(double speed) {
