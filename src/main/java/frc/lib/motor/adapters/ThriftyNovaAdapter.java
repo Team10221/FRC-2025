@@ -86,4 +86,8 @@ public class ThriftyNovaAdapter implements MotorAdapter<ThriftyNova> {
     public void set(double speed) {
         motor.set(speed);
     }
+
+    public void setVolts(double voltage) {
+        motor.setVoltage(voltage);
+    }
 }

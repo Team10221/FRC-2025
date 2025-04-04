@@ -7,6 +7,8 @@ package frc.robot;
 import java.io.File;
 
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -28,9 +30,14 @@ public final class Constants {
     public final class VisionSubsystemConstants {
         // transform = transformation from robot center to camera location
         public static record CameraConfiguration(String name, Transform3d transform) {}
+        /**
+         * OI hi there, there's both an AndyMark and an welded field for this year
+         * - use AndyMark if you're on a public field (and they use andymark themselves)
+         * - use welded if you're on an actual frc comp
+         */
         public static AprilTagFields SELECTED_FIELD = AprilTagFields.kDefaultField; // "k2025ReefscapeWelded"
         public static final CameraConfiguration[] CAMERAS = {
-            new CameraConfiguration("FRONT", null) // (main) camera, probably lol
+            new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d()) // (main) camera, probably lol
         };
     }
 
@@ -39,8 +46,22 @@ public final class Constants {
         // (aka https://github.com/frc457/EverybotSwerveYAGSL/tree/main/src/main/deploy/swerve/maxSwerve/modules)
         public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve/maxSwerve");
         public static final double MAXIMUM_DRIVETRAIN_SPEED = Units.feetToMeters(14.63);
+
+        public static final PIDController POSE_X_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+        public static final PIDController POSE_Y_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+        public static final PIDController HEADING_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+
         // SHEESH
-        // w work eddie
+        // bad work eddie
     }
 
     public final class AlgaeManipConstants {

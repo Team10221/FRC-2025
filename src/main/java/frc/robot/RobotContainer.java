@@ -15,7 +15,7 @@ import frc.robot.subsystems.CoralManipulator;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.MotorTest;
 import frc.robot.subsystems.SwerveSubsystem;
-// import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
 import frc.robot.Constants.CoralManipConstants.CoralManipAngleState;
@@ -25,7 +25,7 @@ import frc.robot.Constants.MotorTestConstants.MotorTestState;
 
 public class RobotContainer {
   public SwerveSubsystem swerve;
-  // public VisionSubsystem vision;
+  public VisionSubsystem vision;
   // public AlgaeManipulator algaeManipulator;
   // public CoralManipulator coralManipulator;
   // public Elevator elevator;
@@ -39,7 +39,7 @@ public class RobotContainer {
       e.printStackTrace();
       System.exit(1);
     }
-    // this.vision = new VisionSubsystem(swerve);
+    this.vision = new VisionSubsystem(swerve);
     // this.algaeManipulator = new AlgaeManipulator();
     // this.coralManipulator = new CoralManipulator();
     // this.elevator = new Elevator();

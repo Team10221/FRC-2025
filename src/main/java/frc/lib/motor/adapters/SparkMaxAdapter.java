@@ -116,4 +116,8 @@ public class SparkMaxAdapter implements MotorAdapter<SparkMax> {
   public void set(double speed) {
     motor.set(speed);
   }
+
+  public void setVolts(double volts) {
+    motor.setVoltage(volts);
+  }
 }
