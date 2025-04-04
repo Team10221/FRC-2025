@@ -28,6 +28,11 @@ public final class Constants {
     public final class VisionSubsystemConstants {
         // transform = transformation from robot center to camera location
         public static record CameraConfiguration(String name, Transform3d transform) {}
+        /**
+         * OI hi there, there's both an AndyMark and an welded field for this year
+         * - use AndyMark if you're on a public field (and they use andymark themselves)
+         * - use welded if you're on an actual frc comp
+         */
         public static AprilTagFields SELECTED_FIELD = AprilTagFields.kDefaultField; // "k2025ReefscapeWelded"
         public static final CameraConfiguration[] CAMERAS = {
             new CameraConfiguration("FRONT", null) // (main) camera, probably lol

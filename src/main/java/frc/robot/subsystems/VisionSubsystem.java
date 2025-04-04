@@ -25,7 +25,7 @@ public class VisionSubsystem extends SubsystemBase {
             var cam = new PhotonCamera(entry.name());
             cameras[i] = new VisionCamera(
                 cam,
-                new PhotonPoseEstimator(layout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, entry.transform())
+                new PhotonPoseEstimator(layout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, entry.transform())
             );
         }
     }
