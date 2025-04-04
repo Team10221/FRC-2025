@@ -7,6 +7,8 @@ package frc.robot;
 import java.io.File;
 
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -39,13 +41,47 @@ public final class Constants {
         };
     }
 
+    public final class ElevatorConstants {
+        public static final int MAIN_MOTOR_ID = 69;
+        public static final int OTHER_MOTOR_ID_THAT_WILL_BE_INVERTED_SOMEHOW = -420;
+        public static final double ENCODER_TICKS_PER_METER = 10D;
+
+        public static final PIDController ELEVATOR_MOTOR_PID = new PIDController(0, 0, 0);
+        public static final ElevatorFeedforward ELEVATOR_FEEDFORWARD = new ElevatorFeedforward(
+            /* kS, kG, kV */
+            0, 0, 0
+        );
+
+        public static enum ElevatorPosition {
+            BOTTOM(0), TOP(1);
+
+            protected double position;
+            ElevatorPosition(double pos) { position = pos; }
+            public double getPosition() { return position; } 
+        }
+    }
+
     public final class SwerveDriveConstants {
         // yo uh i pulled this from https://www.chiefdelphi.com/t/yagsl-working-configurations/492586/9 btw
         // (aka https://github.com/frc457/EverybotSwerveYAGSL/tree/main/src/main/deploy/swerve/maxSwerve/modules)
         public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve/maxSwerve");
         public static final double MAXIMUM_DRIVETRAIN_SPEED = Units.feetToMeters(14.63);
+
+        public static final PIDController POSE_X_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+        public static final PIDController POSE_Y_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+        public static final PIDController HEADING_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+
         // SHEESH
-        // w work eddie
+        // bad work eddie
     }
 
     public final class AlgaeManipConstants {

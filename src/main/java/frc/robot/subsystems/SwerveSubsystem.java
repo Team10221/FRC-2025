@@ -3,9 +3,11 @@ package frc.robot.subsystems;
 import java.io.File;
 import java.io.IOException;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
@@ -30,6 +32,21 @@ public class SwerveSubsystem extends SubsystemBase {
         this.maximumSpeed = maxSpeed;
         this.swerveDrive = new SwerveParser(swerveDir).createSwerveDrive(maxSpeed);
     }
+
+    /* BEGIN CHOREO SHIT */
+
+    // FIXME: i dont know what im doing hELP. i am not sure if i can just do this (is sample.x & y being relative to the blue wall an issue?)
+    public void followTrajectory(SwerveSample sample) {
+        Pose2d robotPose = getRobotPose();
+        ChassisSpeeds speed = new ChassisSpeeds(
+            sample.vx + SwerveDriveConstants.POSE_X_CONTROLLER.calculate(robotPose.getX(), sample.x),
+            sample.vy + SwerveDriveConstants.POSE_Y_CONTROLLER.calculate(robotPose.getY(), sample.y),
+            sample.omega + SwerveDriveConstants.HEADING_CONTROLLER.calculate(robotPose.getRotation().getRadians(), sample.heading)
+        );
+        swerveDrive.drive(speed);
+    }
+    /* END CHOREO SHIT */   
+
     public void stop() {
         swerveDrive.drive(new ChassisSpeeds(0D, 0D, 0D));
     }
