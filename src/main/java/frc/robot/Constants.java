@@ -59,7 +59,7 @@ public final class Constants {
     public final class SwerveDriveConstants {
         // yo uh i pulled this from https://www.chiefdelphi.com/t/yagsl-working-configurations/492586/9 btw
         // (aka https://github.com/frc457/EverybotSwerveYAGSL/tree/main/src/main/deploy/swerve/maxSwerve/modules)
-        public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve");
+        public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve/maxSwerve");
         public static final double MAXIMUM_DRIVETRAIN_SPEED = Units.feetToMeters(14.63);
 
         public static final PIDController POSE_X_CONTROLLER = new PIDController(
@@ -84,10 +84,13 @@ public final class Constants {
         public static final int RIGHT_MOTOR_ID = 12;
         public static final int ANGLE_MOTOR_ID = 13;
 
+        public static final int END_MOTORS_CURRENT_LIMIT = 20;
+        public static final int PIVOT_CURRENT_LIMIT = 40;
+
         public static final PID ANGLE_MOTOR_PID = new PID(0, 0, 0);
 
         public static enum AlgaeManipAngleState {
-            IDLE(0), UP(0); // TODO: replace w/ actual values
+            UP(0), OUT(0); // TODO: replace w/ actual values
 
             public final double position;
 
@@ -97,7 +100,7 @@ public final class Constants {
         }
 
         public static enum AlgaeManipState {
-            INTAKE(1, -1), RELEASE(-0.5, 0.5);
+            IDLE(0, 0), INTAKE(1, -1), RELEASE(-0.5, 0.5);
 
             public final double leftMotorSpeed, rightMotorSpeed;
 
@@ -112,6 +115,9 @@ public final class Constants {
         public static final int MANIP_MOTOR_ID = 14;
         public static final int ANGLE_MOTOR_ID = 15;
 
+        public static final int MANIP_CURRENT_LIMIT = 30;
+        public static final int PIVOT_CURRENT_LIMIT = 40;
+
         public static final PID ANGLE_MOTOR_PID = new PID(0, 0, 0);
 
         public static enum CoralManipAngleState {
@@ -124,7 +130,7 @@ public final class Constants {
         }
 
         public static enum CoralManipState {
-            INTAKE(0), OUTTAKE(0), REST(0);
+            REST(0), INTAKE(0), OUTTAKE(0), HOLD(0);
 
             public final double speed;
             CoralManipState(double speed) {
@@ -133,8 +139,44 @@ public final class Constants {
         }        
     }
 
+    public final class ElevatorConstants {
+        public static final int LEADER_MOTOR_ID = 9;
+        public static final int FOLLOWER_MOTOR_ID = 10;
+        public static final int CURRENT_LIMIT = 40;
+
+        public static final double MAX_HEIGHT = 0.7366; // in meters
+        public static final double SPROCKET_CIRCUMFERENCE = 0.1397;
+        public static final double GEAR_RATIO = 9;
+        public static final double TOLERANCE = 0.02;
+        
+        public static final PID ELEVATOR_PID = new PID(0, 0, 0, 0);
+
+        public static enum ElevatorState {
+            DOWN(0), L1(0), L2(0), L3(0), L4(0),
+            ALG1(0), ALG2(0), MID(MAX_HEIGHT * 0.5), MAX(MAX_HEIGHT);
+
+            public final double height;
+            ElevatorState(double height) {
+                this.height = height;
+            }
+        }
+    }
+
+    public final class MotorTestConstants {
+        public static final double elevatorSpeed = 0.6;
+        public static enum MotorTestState {
+            REST(0), FORWARD(elevatorSpeed), REVERSE(-elevatorSpeed);
+
+            public final double speed;
+            MotorTestState(double speed) {
+                this.speed = speed;
+            }
+        }
+    }
+
     public final class ControllerConstants {
-        public static final int CONTROLLER_PORT = 0;
+        public static final int PRIMARY_PORT = 0;
+        public static final int SECONDARY_PORT = 1;
         public static final double DEADBAND = 0.05;
         public static final double ROTATION_SPEED = 2;
     }

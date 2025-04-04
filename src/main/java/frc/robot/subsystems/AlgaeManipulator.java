@@ -7,11 +7,14 @@ import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipAngleState;
 
 public class AlgaeManipulator extends Subsystem<Double> {
-  private final Motor leftMotor = Motor.nova(AlgaeManipConstants.LEFT_MOTOR_ID);
-  private final Motor rightMotor = Motor.nova(AlgaeManipConstants.RIGHT_MOTOR_ID);
+  private final Motor leftMotor = Motor.nova(AlgaeManipConstants.LEFT_MOTOR_ID)
+    .setCurrentLimit(AlgaeManipConstants.END_MOTORS_CURRENT_LIMIT);
+  private final Motor rightMotor = Motor.nova(AlgaeManipConstants.RIGHT_MOTOR_ID)
+    .setCurrentLimit(AlgaeManipConstants.END_MOTORS_CURRENT_LIMIT);
   private final Motor angleMotor = Motor.neo(AlgaeManipConstants.ANGLE_MOTOR_ID)
-      .setPID(AlgaeManipConstants.ANGLE_MOTOR_PID)
-      .useExternalEncoder();
+    .setCurrentLimit(AlgaeManipConstants.PIVOT_CURRENT_LIMIT)
+    .setPID(AlgaeManipConstants.ANGLE_MOTOR_PID)
+    .useExternalEncoder();
 
   public AlgaeManipulator() {
     super(AlgaeManipState.class, AlgaeManipAngleState.class);
@@ -25,6 +28,15 @@ public class AlgaeManipulator extends Subsystem<Double> {
 
   public boolean isAtTarget() {
     return angleMotor.isAtTarget(getState(AlgaeManipAngleState.class).position);
+  }
+
+  public void togglePivotState() {
+    AlgaeManipAngleState currentState = getState(AlgaeManipAngleState.class);
+    setState(
+      currentState == AlgaeManipAngleState.OUT
+        ? AlgaeManipAngleState.UP
+        : AlgaeManipAngleState.OUT
+    );
   }
 
   public void stop() {
