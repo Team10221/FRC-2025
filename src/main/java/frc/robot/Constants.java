@@ -61,8 +61,22 @@ public final class Constants {
         // (aka https://github.com/frc457/EverybotSwerveYAGSL/tree/main/src/main/deploy/swerve/maxSwerve/modules)
         public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve");
         public static final double MAXIMUM_DRIVETRAIN_SPEED = Units.feetToMeters(14.63);
+
+        public static final PIDController POSE_X_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+        public static final PIDController POSE_Y_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+        public static final PIDController HEADING_CONTROLLER = new PIDController(
+            /* kP, kI, kD */
+            0, 0, 0
+        );
+
         // SHEESH
-        // w work eddie
+        // bad work eddie
     }
 
     public final class AlgaeManipConstants {

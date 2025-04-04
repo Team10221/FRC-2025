@@ -4,7 +4,16 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
+import choreo.Choreo;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
@@ -16,6 +25,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
+
+  private final Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory("trajectory");
+  private final Timer timer = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -67,11 +79,25 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    if (trajectory.isPresent()) {
+      Trajectory<SwerveSample> traj = trajectory.get();
+      Optional<Pose2d> pose = traj.getInitialPose(isRedAlliance());
+      if (pose.isPresent())
+        m_robotContainer.swerve.resetOdometry(pose.get());
+    } else {
+      System.err.println("WARNING: could not load auto trajectory, lowk cooked ong");
+    }
+    timer.restart();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    if (trajectory.isPresent()) {
+      Optional<SwerveSample> sample = trajectory.get().sampleAt(timer.get(), isRedAlliance());
+      if (sample.isPresent())
+        m_robotContainer.swerve.followTrajectory(sample.get());
+    }
   }
 
   @Override
@@ -103,4 +129,8 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
   }
+
+      private boolean isRedAlliance() {
+        return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
+    }
 }
