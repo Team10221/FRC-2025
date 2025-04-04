@@ -35,7 +35,7 @@ public final class Constants {
          */
         public static AprilTagFields SELECTED_FIELD = AprilTagFields.kDefaultField; // "k2025ReefscapeWelded"
         public static final CameraConfiguration[] CAMERAS = {
-            new CameraConfiguration("ROBOT_CAMERA", null) // (main) camera, probably lol
+            new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d()) // (main) camera, probably lol
         };
     }
 
