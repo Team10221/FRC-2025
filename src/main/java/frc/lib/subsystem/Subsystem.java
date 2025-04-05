@@ -141,7 +141,7 @@ public abstract class Subsystem<T> extends SubsystemBase {
         return getStateValue(enumClass, getFirstKey(enumClass));
     }
 
-    /**
+    /** 
      * Retrieves a specified value from the current state for an enum.
      * 
      * @param enumClass The original enum class.

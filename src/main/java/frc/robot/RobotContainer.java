@@ -1,10 +1,13 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -15,22 +18,29 @@ import frc.robot.subsystems.CoralManipulator;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.MotorTest;
 import frc.robot.subsystems.SwerveSubsystem;
-// import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
 import frc.robot.Constants.CoralManipConstants.CoralManipAngleState;
 import frc.robot.Constants.CoralManipConstants.CoralManipState;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorState;
 import frc.robot.Constants.MotorTestConstants.MotorTestState;
+import frc.robot.auto.AutoModeSelector;
 
 public class RobotContainer {
   public SwerveSubsystem swerve;
-  // public VisionSubsystem vision;
+  public VisionSubsystem vision;
   // public AlgaeManipulator algaeManipulator;
   // public CoralManipulator coralManipulator;
   // public Elevator elevator;
+  // public PS4Controller primary;
+  public PS4Controller joystick;
 
-  public PS4Controller primary;
+  private AutoModeSelector autoModeSelector;
+
+  private static final double ELEVATOR_EXTENSION_THRESHOLD =
+    ElevatorConstants.ElevatorState.MID.height * 0.75;
 
   public RobotContainer() {
     try { this.swerve = new SwerveSubsystem(); }
@@ -39,14 +49,16 @@ public class RobotContainer {
       e.printStackTrace();
       System.exit(1);
     }
-    // this.vision = new VisionSubsystem(swerve);
+    this.vision = new VisionSubsystem(swerve);
     // this.algaeManipulator = new AlgaeManipulator();
     // this.coralManipulator = new CoralManipulator();
     // this.elevator = new Elevator();
 
-    this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT); 
+    // this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT); 
+    this.joystick = new PS4Controller(0);
     // this.secondary = new PS4Controller(ControllerConstants.SECONDARY_PORT);
     // this.primary = new Joystick(ControllerConstants.PRIMARY_PORT);
+    this.autoModeSelector = new AutoModeSelector(this);
     
     configureBindings();
 
@@ -54,9 +66,9 @@ public class RobotContainer {
       new RunCommand(
         () -> {
           // get speeds & apply deadbands
-          double xSpeed = -MathUtil.applyDeadband(primary.getLeftY(), ControllerConstants.DEADBAND);
-          double ySpeed = -MathUtil.applyDeadband(primary.getLeftX(), ControllerConstants.DEADBAND);
-          double rotSpeed = -MathUtil.applyDeadband(primary.getRightX(), ControllerConstants.DEADBAND);
+          double xSpeed = MathUtil.applyDeadband(joystick.getLeftY(), ControllerConstants.DEADBAND);
+          double ySpeed = MathUtil.applyDeadband(joystick.getLeftX(), ControllerConstants.DEADBAND);
+          double rotSpeed = -MathUtil.applyDeadband(joystick.getRightX(), ControllerConstants.DEADBAND);
           /*
           double xSpeed = -MathUtil.applyDeadband(primary.getRawAxis(1), ControllerConstants.DEADBAND);
           double ySpeed = -MathUtil.applyDeadband(primary.getRawAxis(0), ControllerConstants.DEADBAND);
@@ -69,9 +81,12 @@ public class RobotContainer {
           rotSpeed = Math.copySign(rotSpeed * rotSpeed, rotSpeed);
 
           // apply multipliers
-          xSpeed *= swerve.getMaxSpeed();
-          ySpeed *= swerve.getMaxSpeed();
-          rotSpeed *= ControllerConstants.ROTATION_SPEED;
+          //double speedMultiplier = getSpeedMultiplier();
+          double speedMultiplier = 1;
+
+          xSpeed *= swerve.getMaxSpeed() * speedMultiplier;
+          ySpeed *= swerve.getMaxSpeed() * speedMultiplier;
+          rotSpeed *= ControllerConstants.ROTATION_SPEED * speedMultiplier;
 
           swerve.drive(
             new Translation2d(xSpeed, ySpeed), 
@@ -85,6 +100,9 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    // new JoystickButton(primary, PS4Controller.Button.kCross.value)
+    //   .whileTrue(new InstantCommand(() -> elevator.setState(ElevatorState.MID)))
+    //   .onFalse(new InstantCommand(() -> elevator.setState(ElevatorState.DOWN)));
     /* 
     new JoystickButton(primary, 1) // A
       .whileTrue(new InstantCommand(() -> motorTest.setState(MotorTestState.FORWARD)))
@@ -144,5 +162,17 @@ public class RobotContainer {
     */
   }
 
-  // public Command getAutonomousCommand() {}
+  /*
+  private double getSpeedMultiplier() {
+    double currentHeight = elevator.getState(ElevatorState.class).height;
+    if (currentHeight > ELEVATOR_EXTENSION_THRESHOLD) {
+      return 0.5;
+    }
+    return 1.0;
+  }
+  */
+
+  public Command getAutonomousCommand() {
+    return autoModeSelector.getAutonomousCommand();
+  }
 }

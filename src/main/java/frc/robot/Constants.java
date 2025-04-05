@@ -30,7 +30,7 @@ public final class Constants {
         public static record CameraConfiguration(String name, Transform3d transform) {}
         public static AprilTagFields SELECTED_FIELD = AprilTagFields.kDefaultField; // "k2025ReefscapeWelded"
         public static final CameraConfiguration[] CAMERAS = {
-            new CameraConfiguration("FRONT", null) // (main) camera, probably lol
+            new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d()) // (main) camera, probably lol
         };
     }
 
@@ -113,11 +113,10 @@ public final class Constants {
         public static final double GEAR_RATIO = 9;
         public static final double TOLERANCE = 0.02;
         
-        public static final PID ELEVATOR_PID = new PID(0, 0, 0, 0);
+        public static final PID ELEVATOR_PID = new PID(1, 0, 0, 0);
 
         public static enum ElevatorState {
-            DOWN(0), L1(0), L2(0), L3(0), L4(0),
-            ALG1(0), ALG2(0), MID(MAX_HEIGHT * 0.5), MAX(MAX_HEIGHT);
+            DOWN(0), MID(MAX_HEIGHT * 0.5), MAX(MAX_HEIGHT);
 
             public final double height;
             ElevatorState(double height) {

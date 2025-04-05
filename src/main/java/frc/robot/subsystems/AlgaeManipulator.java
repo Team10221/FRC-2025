@@ -7,9 +7,9 @@ import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipAngleState;
 
 public class AlgaeManipulator extends Subsystem<Double> {
-  private final Motor leftMotor = Motor.nova(AlgaeManipConstants.LEFT_MOTOR_ID)
+  private final Motor leftMotor = Motor.neo(AlgaeManipConstants.LEFT_MOTOR_ID)
     .setCurrentLimit(AlgaeManipConstants.END_MOTORS_CURRENT_LIMIT);
-  private final Motor rightMotor = Motor.nova(AlgaeManipConstants.RIGHT_MOTOR_ID)
+  private final Motor rightMotor = Motor.neo(AlgaeManipConstants.RIGHT_MOTOR_ID)
     .setCurrentLimit(AlgaeManipConstants.END_MOTORS_CURRENT_LIMIT);
   private final Motor angleMotor = Motor.neo(AlgaeManipConstants.ANGLE_MOTOR_ID)
     .setCurrentLimit(AlgaeManipConstants.PIVOT_CURRENT_LIMIT)

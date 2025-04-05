@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
+  private boolean autoDone = false;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -67,6 +68,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    this.autoDone = false;
+    m_robotContainer.getAutonomousCommand().until(() -> autoDone).schedule();
+  }
+
+  @Override
+  public void autonomousExit() {
+    this.autoDone = true;
   }
 
   /** This function is called periodically during autonomous. */

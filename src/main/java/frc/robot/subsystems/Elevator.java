@@ -43,14 +43,14 @@ public class Elevator extends Subsystem<Double> {
     // might have to update these methods in accordance with the nature of a 2 stage elevator
     // TODO - must test though
 
-    private double heightToRotations(double heightMeters) {
+    public double heightToRotations(double heightMeters) {
         if (heightMeters < 0 || heightMeters > ElevatorConstants.MAX_HEIGHT) {
             throw new IllegalArgumentException("Invalid height: " + heightMeters);
         }
         return (heightMeters / ElevatorConstants.SPROCKET_CIRCUMFERENCE) * ElevatorConstants.GEAR_RATIO;
     }
 
-    private double rotationsToHeight(double rotations) {
+    public double rotationsToHeight(double rotations) {
         return (rotations / ElevatorConstants.GEAR_RATIO) * ElevatorConstants.SPROCKET_CIRCUMFERENCE;
     }
 
