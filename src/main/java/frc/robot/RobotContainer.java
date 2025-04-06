@@ -49,6 +49,7 @@ public class RobotContainer {
     this.elevator = new Elevator();
 
     this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT);
+    this.secondary = new XboxController(ControllerConstants.SECONDARY_PORT);
 
     this.currentState = RobotState.NORMAL;
     this.autoModeSelector = new AutoModeSelector(this);
