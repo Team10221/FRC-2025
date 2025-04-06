@@ -1,10 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,34 +10,31 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.subsystems.AlgaeManipulator;
 import frc.robot.subsystems.CoralManipulator;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.MotorTest;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
-import frc.robot.Constants.CoralManipConstants.CoralManipAngleState;
 import frc.robot.Constants.CoralManipConstants.CoralManipState;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.ElevatorConstants.ElevatorState;
-import frc.robot.Constants.MotorTestConstants.MotorTestState;
+import frc.robot.Constants.RobotConstants;
+import frc.robot.Constants.RobotState;
 import frc.robot.auto.AutoModeSelector;
 
 public class RobotContainer {
   public SwerveSubsystem swerve;
   public VisionSubsystem vision;
-  // public AlgaeManipulator algaeManipulator;
-  // public CoralManipulator coralManipulator;
-  // public Elevator elevator;
-  // public PS4Controller primary;
-  public PS4Controller joystick;
+  public AlgaeManipulator algaeManipulator;
+  public CoralManipulator coralManipulator;
+  public Elevator elevator;
 
+  public PS4Controller primary;
+  public XboxController secondary;
+
+  private RobotState currentState;
   private AutoModeSelector autoModeSelector;
-
-  private static final double ELEVATOR_EXTENSION_THRESHOLD =
-    ElevatorConstants.ElevatorState.MID.height * 0.75;
 
   public RobotContainer() {
     try { this.swerve = new SwerveSubsystem(); }
@@ -50,14 +44,13 @@ public class RobotContainer {
       System.exit(1);
     }
     this.vision = new VisionSubsystem(swerve);
-    // this.algaeManipulator = new AlgaeManipulator();
-    // this.coralManipulator = new CoralManipulator();
-    // this.elevator = new Elevator();
+    this.algaeManipulator = new AlgaeManipulator();
+    this.coralManipulator = new CoralManipulator();
+    this.elevator = new Elevator();
 
-    // this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT); 
-    this.joystick = new PS4Controller(0);
-    // this.secondary = new PS4Controller(ControllerConstants.SECONDARY_PORT);
-    // this.primary = new Joystick(ControllerConstants.PRIMARY_PORT);
+    this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT);
+
+    this.currentState = RobotState.NORMAL;
     this.autoModeSelector = new AutoModeSelector(this);
     
     configureBindings();
@@ -66,14 +59,9 @@ public class RobotContainer {
       new RunCommand(
         () -> {
           // get speeds & apply deadbands
-          double xSpeed = MathUtil.applyDeadband(joystick.getLeftY(), ControllerConstants.DEADBAND);
-          double ySpeed = MathUtil.applyDeadband(joystick.getLeftX(), ControllerConstants.DEADBAND);
-          double rotSpeed = -MathUtil.applyDeadband(joystick.getRightX(), ControllerConstants.DEADBAND);
-          /*
-          double xSpeed = -MathUtil.applyDeadband(primary.getRawAxis(1), ControllerConstants.DEADBAND);
-          double ySpeed = -MathUtil.applyDeadband(primary.getRawAxis(0), ControllerConstants.DEADBAND);
-          double rotSpeed = -MathUtil.applyDeadband(primary.getRawAxis(4), ControllerConstants.DEADBAND);
-          */
+          double xSpeed = -MathUtil.applyDeadband(primary.getLeftY(), ControllerConstants.DEADBAND);
+          double ySpeed = -MathUtil.applyDeadband(primary.getLeftX(), ControllerConstants.DEADBAND);
+          double rotSpeed = -MathUtil.applyDeadband(primary.getRightX(), ControllerConstants.DEADBAND);
 
           // square speeds for better control
           xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
@@ -81,12 +69,11 @@ public class RobotContainer {
           rotSpeed = Math.copySign(rotSpeed * rotSpeed, rotSpeed);
 
           // apply multipliers
-          //double speedMultiplier = getSpeedMultiplier();
-          double speedMultiplier = 1;
+          double mul = currentState.driveSpeedMultiplier;
 
-          xSpeed *= swerve.getMaxSpeed() * speedMultiplier;
-          ySpeed *= swerve.getMaxSpeed() * speedMultiplier;
-          rotSpeed *= ControllerConstants.ROTATION_SPEED * speedMultiplier;
+          xSpeed *= swerve.getMaxSpeed() * mul;
+          ySpeed *= swerve.getMaxSpeed() * mul;
+          rotSpeed *= ControllerConstants.ROTATION_SPEED * mul;
 
           swerve.drive(
             new Translation2d(xSpeed, ySpeed), 
@@ -99,78 +86,109 @@ public class RobotContainer {
     );
   }
 
+  private void changeState(RobotState targetState) {
+    if (currentState == RobotState.NORMAL) {
+      // we're at the normal configuration - now we check what we want to score
+      if (RobotConstants.ALGAE_STATES.contains(targetState)) {
+        // in this case, we're transitioning to an algae state
+        // firstly, the coral manipulator should move out of the way
+        // afterward, the elevator and algae manipulator should change states
+        if (targetState != RobotState.ALGAE_OUTTAKE_PROCESSOR) {
+          new SequentialCommandGroup(
+            new InstantCommand(() -> coralManipulator.setState(targetState.coralManipAngleState)),
+            new WaitCommand(0.5),
+            new InstantCommand(() -> elevator.setState(targetState.elevatorState)),
+            new InstantCommand(() -> algaeManipulator.setState(targetState.algaeManipAngleState))
+          ).schedule();
+        } else {
+          // in this case, we're transitioning from the normal state to the processor state
+          // no need for a command then!
+          elevator.setState(targetState.elevatorState);
+          coralManipulator.setState(targetState.coralManipAngleState);
+          algaeManipulator.setState(targetState.algaeManipAngleState);
+        }
+      } else {
+        // in this case, we're transitioning to a coral state from normal
+        // let's bring out the manipulator first, then the elevator
+        new SequentialCommandGroup(
+          new InstantCommand(() -> coralManipulator.setState(targetState.coralManipAngleState)),
+          new WaitCommand(0.5),
+          new InstantCommand(() -> elevator.setState(targetState.elevatorState))
+        ).schedule();
+      }
+    } else if (RobotConstants.CORAL_STATES.contains(currentState)) {
+      // in this case, the current state is a coral state
+      // there are a few cases: -> algae, normal, coral
+      if (RobotConstants.ALGAE_STATES.contains(targetState)) {
+        // do nothing - we shouldn't be transitioning to algae from coral
+      } else if (RobotConstants.CORAL_STATES.contains(targetState)) {
+        // only thing that differs is elevator position
+        elevator.setState(targetState.elevatorState);
+      } else {
+        // in this case, we're returning to normal from coral
+        // first we bring the elevator down and bringing coral in
+        new SequentialCommandGroup(
+          new InstantCommand(() -> elevator.setState(targetState.elevatorState)),
+          new WaitCommand(1),
+          new InstantCommand(() -> coralManipulator.setState(targetState.coralManipAngleState))
+        ).schedule();
+      }
+    } else if (RobotConstants.ALGAE_STATES.contains(currentState)) {
+      // here, we're currently in an algae state
+      // we shouldn't transition to coral from here, only to normal or another algae state
+      if (RobotConstants.CORAL_STATES.contains(targetState)) {
+        // do nothing
+      } else if (RobotConstants.ALGAE_STATES.contains(targetState)) {
+        if (targetState != RobotState.ALGAE_OUTTAKE_PROCESSOR) {
+          elevator.setState(targetState.elevatorState);
+        }
+      } else {
+        new SequentialCommandGroup(
+          new InstantCommand(() -> elevator.setState(targetState.elevatorState)),
+          new InstantCommand(() -> algaeManipulator.setState(targetState.algaeManipAngleState)),
+          new WaitCommand(0.5),
+          new InstantCommand(() -> coralManipulator.setState(targetState.coralManipAngleState)) 
+        ).schedule();
+      }
+    }
+    currentState = targetState;
+  }
+
   private void configureBindings() {
-    // new JoystickButton(primary, PS4Controller.Button.kCross.value)
-    //   .whileTrue(new InstantCommand(() -> elevator.setState(ElevatorState.MID)))
-    //   .onFalse(new InstantCommand(() -> elevator.setState(ElevatorState.DOWN)));
-    /* 
-    new JoystickButton(primary, 1) // A
-      .whileTrue(new InstantCommand(() -> motorTest.setState(MotorTestState.FORWARD)))
-      .onFalse(new InstantCommand(() -> motorTest.setState(MotorTestState.REST)));
-    
-    new JoystickButton(primary, 2) // B
-      .whileTrue(new InstantCommand(() -> motorTest.setState(MotorTestState.REVERSE)))
-      .onFalse(new InstantCommand(() -> motorTest.setState(MotorTestState.REST)));
-    */
-    // primary controls
-    /*
-    new JoystickButton(primary, PS4Controller.Button.kTriangle.value)
-      .onTrue(new InstantCommand(swerve::zeroGyro));
+    // PRIMARY CONTROLS
     new JoystickButton(primary, PS4Controller.Button.kCircle.value)
-      .onTrue(new InstantCommand(swerve::lockPose));
-    */
-
-    // elevator
-    /*
-    new JoystickButton(secondary, PS4Controller.Button.kCross.value)
-      .onTrue(new InstantCommand(() -> elevator.setState(ElevatorState.DOWN)));
-    new JoystickButton(secondary, PS4Controller.Button.kTriangle.value)
-      .onTrue(new InstantCommand(() -> elevator.setState(ElevatorState.MID)));
-    new JoystickButton(secondary, PS4Controller.Button.kCircle.value)
-      .onTrue(new InstantCommand(() -> elevator.setState(ElevatorState.MAX)));
-
-    // algae
-    new JoystickButton(secondary, PS4Controller.Button.kL1.value)
+      .whileTrue(new RunCommand(() -> swerve.lockPose()));
+    new JoystickButton(primary, PS4Controller.Button.kTriangle.value)
+      .onTrue(new InstantCommand(() -> swerve.zeroGyro()));
+    new JoystickButton(primary, PS4Controller.Button.kL1.value)
       .whileTrue(new RunCommand(() -> algaeManipulator.setState(AlgaeManipState.INTAKE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
-    new JoystickButton(secondary, PS4Controller.Button.kR1.value)
+    new JoystickButton(primary, PS4Controller.Button.kL2.value)
       .whileTrue(new RunCommand(() -> algaeManipulator.setState(AlgaeManipState.RELEASE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
-    new JoystickButton(secondary, PS4Controller.Button.kSquare.value)
-      .onTrue(new InstantCommand(algaeManipulator::togglePivotState));
+    new JoystickButton(primary, PS4Controller.Button.kR1.value)
+      .whileTrue(new RunCommand(() -> algaeManipulator.setState(CoralManipState.INTAKE)))
+      .onFalse(new InstantCommand(() -> algaeManipulator.setState(CoralManipState.REST)));
+    new JoystickButton(primary, PS4Controller.Button.kR2.value)
+      .whileTrue(new RunCommand(() -> algaeManipulator.setState(CoralManipState.OUTTAKE)))
+      .onFalse(new InstantCommand(() -> algaeManipulator.setState(CoralManipState.REST))); 
 
-    // coral
-    new JoystickButton(secondary, PS4Controller.Button.kL2.value)
-      .whileTrue(new InstantCommand(() -> {
-        coralManipulator.setState(CoralManipState.INTAKE);
-        coralManipulator.setState(CoralManipAngleState.INTAKE);
-      })).onFalse(new InstantCommand(() -> {
-        coralManipulator.setState(CoralManipState.REST);
-        coralManipulator.setState(CoralManipAngleState.IDLE);
-      }));
-    new JoystickButton(secondary, PS4Controller.Button.kR2.value)
-      .whileTrue(new InstantCommand(() -> 
-        coralManipulator.setState(CoralManipAngleState.SCORING)
-      )).onFalse(new SequentialCommandGroup(
-        new InstantCommand(() -> coralManipulator.setState(CoralManipState.OUTTAKE)),
-        new WaitCommand(0.5),
-        new InstantCommand(() -> {
-            coralManipulator.setState(CoralManipState.REST);
-            coralManipulator.setState(CoralManipAngleState.IDLE);
-        })
-    ));
-    */
+    // SECONDARY CONTROLS
+    new JoystickButton(secondary, XboxController.Button.kX.value)
+      .onTrue(new InstantCommand(() -> changeState(RobotState.NORMAL)));
+    new JoystickButton(secondary, XboxController.Button.kY.value)
+      .onTrue(new InstantCommand(() -> changeState(RobotState.ALGAE_OUTTAKE_PROCESSOR)));
+    new JoystickButton(secondary, XboxController.Button.kA.value)
+      .onTrue(new InstantCommand(() -> changeState(RobotState.ALGAE_REEF_INTAKE_L2)));
+    new JoystickButton(secondary, XboxController.Button.kB.value)
+      .onTrue(new InstantCommand(() -> changeState(RobotState.ALGAE_REEF_INTAKE_L3)));
+    new POVButton(secondary, 0)
+      .onTrue(new InstantCommand(() -> changeState(RobotState.CORAL_L2)));
+    new POVButton(secondary, 90)
+      .onTrue(new InstantCommand(() -> changeState(RobotState.CORAL_L3)));
+    new POVButton(secondary, 180)
+      .onTrue(new InstantCommand(() -> changeState(RobotState.CORAL_L4)));
   }
-
-  /*
-  private double getSpeedMultiplier() {
-    double currentHeight = elevator.getState(ElevatorState.class).height;
-    if (currentHeight > ELEVATOR_EXTENSION_THRESHOLD) {
-      return 0.5;
-    }
-    return 1.0;
-  }
-  */
 
   public Command getAutonomousCommand() {
     return autoModeSelector.getAutonomousCommand();

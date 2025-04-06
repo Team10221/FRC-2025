@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -11,32 +12,43 @@ import frc.robot.Constants.ElevatorConstants.ElevatorState;
 public class Elevator extends Subsystem<Double> {
     private final Motor leaderMotor = Motor.falcon(ElevatorConstants.LEADER_MOTOR_ID)
         .setPID(ElevatorConstants.ELEVATOR_PID)
-        .setCurrentLimit(ElevatorConstants.CURRENT_LIMIT);
+        .setCurrentLimit(ElevatorConstants.CURRENT_LIMIT)
+        .config(adapter -> {
+            TalonFX motorController = (TalonFX) adapter.getMotorController(); 
+            disableSoftwareLimits(motorController);
+            motorController.setPosition(0);
+        });
     private final Motor followerMotor = Motor.falcon(ElevatorConstants.FOLLOWER_MOTOR_ID)
         .setCurrentLimit(ElevatorConstants.CURRENT_LIMIT)
         .config(adapter -> {
-            ((TalonFX) adapter.getMotorController())
-                .setControl(
-                    new Follower(
-                        ElevatorConstants.LEADER_MOTOR_ID, 
-                        true
-                    )
-                );
+            TalonFX motorController = (TalonFX) adapter.getMotorController();
+            disableSoftwareLimits(motorController);
+            motorController.setPosition(0);
+            motorController.setControl(
+                new Follower(
+                    ElevatorConstants.LEADER_MOTOR_ID, 
+                    true
+                )
+            );
         });
+
+    private void disableSoftwareLimits(TalonFX motor) {
+        SoftwareLimitSwitchConfigs configs = new SoftwareLimitSwitchConfigs();
+        configs.ForwardSoftLimitEnable = false;
+        configs.ReverseSoftLimitEnable = false;
+        motor.getConfigurator().apply(configs);
+    }
 
     public Elevator() {
         super(ElevatorState.class);
-        leaderMotor.config(adapter -> {
-            double maxRotations = heightToRotations(ElevatorConstants.MAX_HEIGHT);
-            adapter.setSoftLimits(maxRotations, 0);
-        });
     }
 
     public void updateMotors() {
+        // as the leader motor rotates downward normally, we invert the reference
         leaderMotor.setRef(
             heightToRotations(
                 getState(ElevatorState.class).height
-            )
+            ) * (-1)
         );
     }
 
@@ -53,6 +65,8 @@ public class Elevator extends Subsystem<Double> {
     public double rotationsToHeight(double rotations) {
         return (rotations / ElevatorConstants.GEAR_RATIO) * ElevatorConstants.SPROCKET_CIRCUMFERENCE;
     }
+
+    // these two methods are mostly useless
 
     public boolean isAtTarget() {
         double currentHeight = rotationsToHeight(leaderMotor.getPosition());

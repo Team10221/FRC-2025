@@ -89,11 +89,11 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative) {
-        swerveDrive.drive(translation, rotation, fieldRelative, false);
+        swerveDrive.drive(translation, rotation, fieldRelative, false, new Translation2d());
     }
 
     public void drive(Translation2d translation, Rotation2d rotation, boolean fieldRelative) {
-        swerveDrive.drive(translation, rotation.getRadians(), fieldRelative, false);
+        swerveDrive.drive(translation, rotation.getRadians(), fieldRelative, false, new Translation2d());
     }
 
     public void addVisionMeasurement(Pose2d robotPose, double timestamp) {

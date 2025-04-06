@@ -13,8 +13,7 @@ public class AlgaeManipulator extends Subsystem<Double> {
     .setCurrentLimit(AlgaeManipConstants.END_MOTORS_CURRENT_LIMIT);
   private final Motor angleMotor = Motor.neo(AlgaeManipConstants.ANGLE_MOTOR_ID)
     .setCurrentLimit(AlgaeManipConstants.PIVOT_CURRENT_LIMIT)
-    .setPID(AlgaeManipConstants.ANGLE_MOTOR_PID)
-    .useExternalEncoder();
+    .setPID(AlgaeManipConstants.ANGLE_MOTOR_PID);
 
   public AlgaeManipulator() {
     super(AlgaeManipState.class, AlgaeManipAngleState.class);
