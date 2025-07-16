@@ -1,5 +1,6 @@
 package frc.lib.motor.adapters;
 
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 
 import frc.lib.motor.MotorAdapter;
@@ -18,6 +19,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 public class SparkMaxAdapter implements MotorAdapter<SparkMax> {
   private SparkMax motor;
   private SparkMaxConfig config;
+  private SparkClosedLoopController controller;
   private boolean usingExternalEncoder = false;
 
   public SparkMaxAdapter(SparkMax motor) {
@@ -42,6 +44,7 @@ public class SparkMaxAdapter implements MotorAdapter<SparkMax> {
         case VOLTAGE -> ControlType.kVoltage;
       }
     );
+
   }
 
   public double getPosition() {

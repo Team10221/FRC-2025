@@ -56,9 +56,6 @@ public class Elevator extends Subsystem<Double> {
     // TODO - must test though
 
     public double heightToRotations(double heightMeters) {
-        if (heightMeters < 0 || heightMeters > ElevatorConstants.MAX_HEIGHT) {
-            throw new IllegalArgumentException("Invalid height: " + heightMeters);
-        }
         return (heightMeters / ElevatorConstants.SPROCKET_CIRCUMFERENCE) * ElevatorConstants.GEAR_RATIO;
     }
 

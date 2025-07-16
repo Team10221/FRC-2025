@@ -22,7 +22,12 @@ public class AlgaeManipulator extends Subsystem<Double> {
   public void updateMotors() {
     leftMotor.set(getState(AlgaeManipState.class).leftMotorSpeed);
     rightMotor.set(getState(AlgaeManipState.class).rightMotorSpeed);
-    angleMotor.setRef(getState(AlgaeManipAngleState.class).position);
+    angleMotor.setReference(
+      degreesToRotations(
+        getState(AlgaeManipAngleState.class).position
+      ),
+      Motor.Control.POSITION
+    );
   }
 
   public boolean isAtTarget() {
@@ -36,6 +41,10 @@ public class AlgaeManipulator extends Subsystem<Double> {
         ? AlgaeManipAngleState.UP
         : AlgaeManipAngleState.OUT
     );
+  }
+
+  private double degreesToRotations(double degrees) {
+    return (degrees / 360) * AlgaeManipConstants.GEAR_RATIO;
   }
 
   public void stop() {
