@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.RobotContainer;
 
 public class AutoFactory {
+    /* 
     public static Command leaveCommand(RobotContainer container) {
         // TODO: tune
         return container.swerve.run(() -> {
@@ -34,5 +35,5 @@ public class AutoFactory {
             e.printStackTrace();
             return Commands.none();
         }
-    }
+    } */
 }

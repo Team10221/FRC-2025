@@ -13,13 +13,13 @@ import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 
 public class SparkMaxAdapter implements MotorAdapter<SparkMax> {
   private SparkMax motor;
   private SparkMaxConfig config;
-  private SparkClosedLoopController controller;
   private boolean usingExternalEncoder = false;
 
   public SparkMaxAdapter(SparkMax motor) {
@@ -118,5 +118,13 @@ public class SparkMaxAdapter implements MotorAdapter<SparkMax> {
 
   public void set(double speed) {
     motor.set(speed);
+  }
+
+  public void setBrakeMode() {
+    configure(new SparkMaxConfig().idleMode(IdleMode.kBrake));
+  }
+
+  public void setCoastMode() {
+    configure(new SparkMaxConfig().idleMode(IdleMode.kCoast));
   }
 }

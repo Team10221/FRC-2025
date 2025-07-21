@@ -57,10 +57,10 @@ public final class Constants {
 
         public static final double GEAR_RATIO = 45;
 
-        public static final PID ANGLE_MOTOR_PID = new PID(2, 0, 0);
+        public static final PID ANGLE_MOTOR_PID = new PID(0.05, 0, 0.01);
 
         public static enum AlgaeManipAngleState {
-            UP(0), OUT(-72);
+            UP(-10), STOW(-70), OUT(-90);
 
             public final double position;
 
@@ -88,10 +88,12 @@ public final class Constants {
         public static final int MANIP_CURRENT_LIMIT = 30;
         public static final int PIVOT_CURRENT_LIMIT = 40;
 
-        public static final PID ANGLE_MOTOR_PID = new PID(0.1, 0, 0);
+        public static final double GEAR_RATIO = 45;
+
+        public static final PID ANGLE_MOTOR_PID = new PID(0.3, 0, 0);
 
         public static enum CoralManipAngleState {
-            INTAKE(0.05), SCORE(0.65);
+            INTAKE(0), SCORE(10); // not final values - just for testing
 
             public final double pos;
             CoralManipAngleState(double pos) {
@@ -119,7 +121,7 @@ public final class Constants {
         public static final double GEAR_RATIO = 9;
         public static final double TOLERANCE = 0.02;
         
-        public static final PID ELEVATOR_PID = new PID(0.4, 0, 0);
+        public static final PID ELEVATOR_PID = new PID(0.3, 0, 0);
 
         public static enum ElevatorState {
             DOWN(0), MID(MAX_HEIGHT * 0.5), MAX(MAX_HEIGHT),

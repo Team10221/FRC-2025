@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 
 public class AutoModeSelector {
+    /*
     public enum DesiredMode {
         TEST_AUTO,
         DO_NOTHING,
@@ -46,5 +47,5 @@ public class AutoModeSelector {
             default:
                 return Commands.none();
         }
-    }
+    } */
 }

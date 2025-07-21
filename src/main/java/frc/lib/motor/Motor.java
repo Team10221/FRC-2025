@@ -309,6 +309,22 @@ public class Motor {
   }
 
   /**
+   * Sets the motor to brake mode.
+   */
+  public Motor setBrakeMode() {
+    adapter.setBrakeMode();
+    return this;
+  }
+
+  /**
+   * Sets the motor to coast mode. 
+   */
+  public Motor setCoastMode() {
+    adapter.setCoastMode();
+    return this;
+  }
+
+  /**
    * States whether the motor is at a specified target.
    * 
    * @param target The target.

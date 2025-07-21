@@ -9,47 +9,55 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.AlgaeManipulator;
+import frc.robot.subsystems.CoralManipulator;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipAngleState;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
+import frc.robot.Constants.CoralManipConstants.CoralManipAngleState;
+import frc.robot.Constants.CoralManipConstants.CoralManipState;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorState;
 import frc.robot.Constants.RobotState;
 import frc.robot.auto.AutoModeSelector;
 
 public class RobotContainer {
-  public SwerveSubsystem swerve;
+  // public SwerveSubsystem swerve;
   // public VisionSubsystem vision;
   public Elevator elevator;
   public AlgaeManipulator algaeManipulator;
+  public CoralManipulator coralManipulator;
+  // public CoralManipulator coralManipulator;
 
   public XboxController primary;
 
-  private RobotState currentState;
+  // private RobotState currentState;
   // private AutoModeSelector autoModeSelector;
 
   public RobotContainer() {
+    /* 
     try { this.swerve = new SwerveSubsystem(); }
     catch (Exception e) {
       System.err.println("YAGSL failed to read our drivetrain swerve configuration! D:");
       e.printStackTrace();
       System.exit(1);
-    }
+    } */
     // this.vision = new VisionSubsystem(swerve);
     // this.coralManipulator = new CoralManipulator();
     this.elevator = new Elevator();
     this.algaeManipulator = new AlgaeManipulator();
+    this.coralManipulator = new CoralManipulator();
 
     // this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT);
     this.primary = new XboxController(ControllerConstants.PRIMARY_PORT);
 
-    this.currentState = RobotState.NORMAL;
+    // this.currentState = RobotState.NORMAL;
     // this.autoModeSelector = new AutoModeSelector(this);
     
     configureBindings();
 
+    /*
     swerve.setDefaultCommand(
       new RunCommand(
         () -> {
@@ -79,6 +87,7 @@ public class RobotContainer {
         swerve
       )
     );
+    */
   }
 
   private void configureBindings() {
@@ -94,6 +103,7 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> elevator.setState(ElevatorState.DOWN)));
     
     // Algae manipulator controls
+    /* 
     new JoystickButton(primary, XboxController.Button.kA.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.INTAKE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
@@ -102,11 +112,24 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.RELEASE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
     
-    new JoystickButton(primary, XboxController.Button.kStart.value)
+    // algae pivot
+    new JoystickButton(primary, XboxController.Button.kY.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipAngleState.OUT)));
-    
-    new JoystickButton(primary, XboxController.Button.kBack.value)
+    new JoystickButton(primary, XboxController.Button.kB.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipAngleState.UP)));
+    */
+    new JoystickButton(primary, XboxController.Button.kA.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipAngleState.INTAKE)));
+    new JoystickButton(primary, XboxController.Button.kB.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipAngleState.SCORE)));
+
+    new JoystickButton(primary, XboxController.Button.kX.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.INTAKE)))
+      .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
+    
+    new JoystickButton(primary, XboxController.Button.kY.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.OUTTAKE)))
+      .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
   }
 
   /*
