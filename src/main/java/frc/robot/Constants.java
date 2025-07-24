@@ -116,7 +116,9 @@ public final class Constants {
         public static final int FOLLOWER_MOTOR_ID = 10;
         public static final int CURRENT_LIMIT = 40;
 
+        // unsure if this value is correct - should be trivial to adjust
         public static final double MAX_HEIGHT = 0.7366; // in meters
+
         public static final double SPROCKET_CIRCUMFERENCE = 0.1397;
         public static final double GEAR_RATIO = 9;
         public static final double TOLERANCE = 0.02;
@@ -124,9 +126,10 @@ public final class Constants {
         public static final PID ELEVATOR_PID = new PID(0.3, 0, 0);
 
         public static enum ElevatorState {
-            DOWN(0), MID(MAX_HEIGHT * 0.5), MAX(MAX_HEIGHT),
-            ALGAE_L2(MAX_HEIGHT * 0.25), ALGAE_L3(MAX_HEIGHT * 0.6), ALGAE_PROCESSOR(0),
-            CORAL_L2(0), CORAL_L3(0), CORAL_L4(0);
+            DOWN(0), ALGAE_L2(MAX_HEIGHT * 0.25), 
+            ALGAE_L3(MAX_HEIGHT * 0.6), ALGAE_PROCESSOR(0),
+            CORAL_L2(0), CORAL_L3(0), 
+            CORAL_L4(0), CORAL_TRANSITION(MAX_HEIGHT * 0.08);
 
             public final double height;
             ElevatorState(double height) {
@@ -148,11 +151,41 @@ public final class Constants {
     }
 
     public static enum RobotState {
-        NORMAL(
+        DEFAULT(
             ElevatorState.DOWN, 
             AlgaeManipAngleState.UP,
             CoralManipAngleState.INTAKE,
             1
+        ),
+        CORAL_TRANSITION_IN(
+            ElevatorState.CORAL_TRANSITION,
+            AlgaeManipAngleState.STOW,
+            CoralManipAngleState.INTAKE,
+            1
+        ),
+        CORAL_TRANSITION_OUT(
+            ElevatorState.CORAL_TRANSITION,
+            AlgaeManipAngleState.STOW,
+            CoralManipAngleState.SCORE,
+            1
+        ),
+        CORAL_L2(
+            ElevatorState.CORAL_L2,
+            AlgaeManipAngleState.STOW,
+            CoralManipAngleState.SCORE,
+            0.4 
+        ),
+        CORAL_L3(
+            ElevatorState.CORAL_L3,
+            AlgaeManipAngleState.STOW,
+            CoralManipAngleState.SCORE,
+            0.4
+        ),
+        CORAL_L4(
+            ElevatorState.CORAL_L4,
+            AlgaeManipAngleState.STOW,
+            CoralManipAngleState.SCORE,
+            0.2
         ),
         ALGAE_REEF_INTAKE_L2(
             ElevatorState.ALGAE_L2,
@@ -171,24 +204,6 @@ public final class Constants {
             AlgaeManipAngleState.OUT,
             CoralManipAngleState.INTAKE,
             1
-        ),
-        CORAL_L2(
-            ElevatorState.CORAL_L2,
-            AlgaeManipAngleState.UP,
-            CoralManipAngleState.SCORE,
-            0.6 
-        ),
-        CORAL_L3(
-            ElevatorState.CORAL_L3,
-            AlgaeManipAngleState.UP,
-            CoralManipAngleState.SCORE,
-            0.4
-        ),
-        CORAL_L4(
-            ElevatorState.CORAL_L4,
-            AlgaeManipAngleState.UP,
-            CoralManipAngleState.SCORE,
-            0.2
         );
 
         public ElevatorState elevatorState;
@@ -209,20 +224,6 @@ public final class Constants {
         }
     }
 
-    public final class RobotConstants {
-        public static final List<RobotState> CORAL_STATES = List.of(
-            RobotState.CORAL_L2, 
-            RobotState.CORAL_L3, 
-            RobotState.CORAL_L4
-        );
-        
-        public static final List<RobotState> ALGAE_STATES = List.of(
-            RobotState.ALGAE_OUTTAKE_PROCESSOR, 
-            RobotState.ALGAE_REEF_INTAKE_L2, 
-            RobotState.ALGAE_REEF_INTAKE_L3
-        );
-    }
-    
     public final class ControllerConstants {
         public static final int PRIMARY_PORT = 0;
         public static final int SECONDARY_PORT = 1;
