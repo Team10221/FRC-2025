@@ -31,16 +31,20 @@ import frc.robot.Constants.ElevatorConstants.ElevatorState;
 public final class Constants {
     public final class VisionSubsystemConstants {
         // transform = transformation from robot center to camera location
-        public static record CameraConfiguration(String name, Transform3d transform) {}
+        public static record CameraConfiguration(String name, Transform3d transform) {
+        }
+
         public static AprilTagFields SELECTED_FIELD = AprilTagFields.kDefaultField; // "k2025ReefscapeWelded"
         public static final CameraConfiguration[] CAMERAS = {
-            new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d()) // (main) camera, probably lol
+                new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d()) // (main) camera, probably lol
         };
     }
 
     public final class SwerveDriveConstants {
-        // yo uh i pulled this from https://www.chiefdelphi.com/t/yagsl-working-configurations/492586/9 btw
-        // (aka https://github.com/frc457/EverybotSwerveYAGSL/tree/main/src/main/deploy/swerve/maxSwerve/modules)
+        // yo uh i pulled this from
+        // https://www.chiefdelphi.com/t/yagsl-working-configurations/492586/9 btw
+        // (aka
+        // https://github.com/frc457/EverybotSwerveYAGSL/tree/main/src/main/deploy/swerve/maxSwerve/modules)
         public static final File SWERVE_JSON_DIRECTORY = new File(Filesystem.getDeployDirectory(), "swerve/maxSwerve");
         public static final double MAXIMUM_DRIVETRAIN_SPEED = Units.feetToMeters(14.63);
         // SHEESH
@@ -90,25 +94,27 @@ public final class Constants {
 
         public static final double GEAR_RATIO = 45;
 
-        public static final PID ANGLE_MOTOR_PID = new PID(0.3, 0, 0);
+        public static final PID ANGLE_MOTOR_PID = new PID(0.04, 0, 0.001);
 
         public static enum CoralManipAngleState {
-            INTAKE(0), SCORE(10); // not final values - just for testing
+            INTAKE(0), SCORE(-150); // -155 probably works too
 
             public final double pos;
+
             CoralManipAngleState(double pos) {
                 this.pos = pos;
             }
         }
 
         public static enum CoralManipState {
-            REST(0), INTAKE(-0.6), OUTTAKE(0.6);
+            REST(0), INTAKE(-0.33), OUTTAKE(0.6);
 
             public final double speed;
+
             CoralManipState(double speed) {
                 this.speed = speed;
-            } 
-        }        
+            }
+        }
     }
 
     public final class ElevatorConstants {
@@ -122,16 +128,19 @@ public final class Constants {
         public static final double SPROCKET_CIRCUMFERENCE = 0.1397;
         public static final double GEAR_RATIO = 9;
         public static final double TOLERANCE = 0.02;
-        
+
         public static final PID ELEVATOR_PID = new PID(0.3, 0, 0);
 
         public static enum ElevatorState {
-            DOWN(0), ALGAE_L2(MAX_HEIGHT * 0.25), 
+            // TODO: Adjust this tmrw with testing. DO NOT FORGET
+            DOWN(0), ALGAE_L2(MAX_HEIGHT * 0.25),
             ALGAE_L3(MAX_HEIGHT * 0.6), ALGAE_PROCESSOR(0),
-            CORAL_L2(0), CORAL_L3(0), 
-            CORAL_L4(0), CORAL_TRANSITION(MAX_HEIGHT * 0.08);
+            CORAL_L2(0), CORAL_L3(0),
+            CORAL_L4(0), CORAL_TRANSITION(MAX_HEIGHT * 0.15),
+            TEST(MAX_HEIGHT * 0.85);
 
             public final double height;
+
             ElevatorState(double height) {
                 this.height = height;
             }
@@ -140,10 +149,12 @@ public final class Constants {
 
     public final class MotorTestConstants {
         public static final double elevatorSpeed = 0.6;
+
         public static enum MotorTestState {
             REST(0), FORWARD(elevatorSpeed), REVERSE(-elevatorSpeed);
 
             public final double speed;
+
             MotorTestState(double speed) {
                 this.speed = speed;
             }
@@ -152,59 +163,50 @@ public final class Constants {
 
     public static enum RobotState {
         DEFAULT(
-            ElevatorState.DOWN, 
-            AlgaeManipAngleState.UP,
-            CoralManipAngleState.INTAKE,
-            1
-        ),
+                ElevatorState.DOWN,
+                AlgaeManipAngleState.UP,
+                CoralManipAngleState.INTAKE,
+                1),
         CORAL_TRANSITION_IN(
-            ElevatorState.CORAL_TRANSITION,
-            AlgaeManipAngleState.STOW,
-            CoralManipAngleState.INTAKE,
-            1
-        ),
+                ElevatorState.CORAL_TRANSITION,
+                AlgaeManipAngleState.STOW,
+                CoralManipAngleState.INTAKE,
+                1),
         CORAL_TRANSITION_OUT(
-            ElevatorState.CORAL_TRANSITION,
-            AlgaeManipAngleState.STOW,
-            CoralManipAngleState.SCORE,
-            1
-        ),
+                ElevatorState.CORAL_TRANSITION,
+                AlgaeManipAngleState.STOW,
+                CoralManipAngleState.SCORE,
+                1),
         CORAL_L2(
-            ElevatorState.CORAL_L2,
-            AlgaeManipAngleState.STOW,
-            CoralManipAngleState.SCORE,
-            0.4 
-        ),
+                ElevatorState.CORAL_L2,
+                AlgaeManipAngleState.STOW,
+                CoralManipAngleState.SCORE,
+                0.4),
         CORAL_L3(
-            ElevatorState.CORAL_L3,
-            AlgaeManipAngleState.STOW,
-            CoralManipAngleState.SCORE,
-            0.4
-        ),
+                ElevatorState.CORAL_L3,
+                AlgaeManipAngleState.STOW,
+                CoralManipAngleState.SCORE,
+                0.4),
         CORAL_L4(
-            ElevatorState.CORAL_L4,
-            AlgaeManipAngleState.STOW,
-            CoralManipAngleState.SCORE,
-            0.2
-        ),
+                ElevatorState.CORAL_L4,
+                AlgaeManipAngleState.STOW,
+                CoralManipAngleState.SCORE,
+                0.2),
         ALGAE_REEF_INTAKE_L2(
-            ElevatorState.ALGAE_L2,
-            AlgaeManipAngleState.OUT,
-            CoralManipAngleState.INTAKE,
-            0.6
-        ),
+                ElevatorState.ALGAE_L2,
+                AlgaeManipAngleState.OUT,
+                CoralManipAngleState.INTAKE,
+                0.6),
         ALGAE_REEF_INTAKE_L3(
-            ElevatorState.ALGAE_L3,
-            AlgaeManipAngleState.OUT,
-            CoralManipAngleState.SCORE,
-            0.6
-        ),
+                ElevatorState.ALGAE_L3,
+                AlgaeManipAngleState.OUT,
+                CoralManipAngleState.SCORE,
+                0.6),
         ALGAE_OUTTAKE_PROCESSOR(
-            ElevatorState.ALGAE_PROCESSOR,
-            AlgaeManipAngleState.OUT,
-            CoralManipAngleState.INTAKE,
-            1
-        );
+                ElevatorState.ALGAE_PROCESSOR,
+                AlgaeManipAngleState.OUT,
+                CoralManipAngleState.INTAKE,
+                1);
 
         public ElevatorState elevatorState;
         public AlgaeManipAngleState algaeManipAngleState;
@@ -212,11 +214,10 @@ public final class Constants {
         public double driveSpeedMultiplier;
 
         RobotState(
-            ElevatorState elevatorState,
-            AlgaeManipAngleState algaeManipAngleState,
-            CoralManipAngleState coralManipAngleState,
-            double driveSpeedMultiplier
-        ) {
+                ElevatorState elevatorState,
+                AlgaeManipAngleState algaeManipAngleState,
+                CoralManipAngleState coralManipAngleState,
+                double driveSpeedMultiplier) {
             this.elevatorState = elevatorState;
             this.algaeManipAngleState = algaeManipAngleState;
             this.coralManipAngleState = coralManipAngleState;

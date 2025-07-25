@@ -3,9 +3,12 @@ package frc.robot.other;
 import java.util.List;
 import java.util.Set;
 
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.RobotState;
-import frc.robot.other.RobotStateMachine.Transition;
 import frc.robot.subsystems.AlgaeManipulator;
 import frc.robot.subsystems.CoralManipulator;
 import frc.robot.subsystems.Elevator;
@@ -16,152 +19,128 @@ public class RobotStateManager {
     private CoralManipulator coralManipulator;
     private AlgaeManipulator algaeManipulator;
     private Elevator elevator;
-    
-    private List<RobotState> currentPath;
-    private int pathIndex;
-    private double stateChangeTime;
-    private double transitionDelay;
+    private Command currentCommand;
+    private RobotState targetState;
 
     public RobotStateManager(
-        Elevator elevator,
-        AlgaeManipulator algaeManipulator,
-        CoralManipulator coralManipulator
-    ) {
+            Elevator elevator,
+            AlgaeManipulator algaeManipulator,
+            CoralManipulator coralManipulator) {
         this.elevator = elevator;
         this.algaeManipulator = algaeManipulator;
         this.coralManipulator = coralManipulator;
         this.currentState = RobotState.DEFAULT;
-        this.stateChangeTime = 0;
-        this.transitionDelay = 0;
-
-        sm = new RobotStateMachine();
+        this.sm = new RobotStateMachine();
         defineTransitions();
         applyState(currentState);
     }
 
     public void defineTransitions() {
         sm.addTransitions(RobotState.DEFAULT, Set.of(
-            new Transition(RobotState.CORAL_TRANSITION_IN, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_IN, 0.2)));
 
         sm.addTransitions(RobotState.CORAL_TRANSITION_IN, Set.of(
-            new Transition(RobotState.DEFAULT, 0.2),
-            new Transition(RobotState.CORAL_TRANSITION_OUT, 0.5)
-        ));
+                new RobotStateMachine.Transition(RobotState.DEFAULT, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.5)));
 
         sm.addTransitions(RobotState.CORAL_TRANSITION_OUT, Set.of(
-            new Transition(RobotState.CORAL_TRANSITION_IN, 0.5),
-            new Transition(RobotState.CORAL_L2, 0.2),
-            new Transition(RobotState.CORAL_L3, 0.2),
-            new Transition(RobotState.CORAL_L4, 0.2),
-            new Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_IN, 0.5),
+                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)));
 
         sm.addTransitions(RobotState.CORAL_L2, Set.of(
-            new Transition(RobotState.CORAL_L3, 0.2),
-            new Transition(RobotState.CORAL_L4, 0.2),
-            new Transition(RobotState.CORAL_TRANSITION_OUT, 0.2),
-            new Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)));
 
         sm.addTransitions(RobotState.CORAL_L3, Set.of(
-            new Transition(RobotState.CORAL_L4, 0.2),
-            new Transition(RobotState.CORAL_L2, 0.2),
-            new Transition(RobotState.CORAL_TRANSITION_OUT, 0.2),
-            new Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)));
 
         sm.addTransitions(RobotState.CORAL_L4, Set.of(
-            new Transition(RobotState.CORAL_TRANSITION_OUT, 0.2),
-            new Transition(RobotState.CORAL_L2, 0.2),
-            new Transition(RobotState.CORAL_L3, 0.2),
-            new Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)));
 
         sm.addTransitions(RobotState.ALGAE_OUTTAKE_PROCESSOR, Set.of(
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2),
-            new Transition(RobotState.CORAL_L2, 0.2),
-            new Transition(RobotState.CORAL_L3, 0.2),
-            new Transition(RobotState.CORAL_L4, 0.2),
-            new Transition(RobotState.CORAL_TRANSITION_OUT, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.2)));
 
         sm.addTransitions(RobotState.ALGAE_REEF_INTAKE_L2, Set.of(
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2),
-            new Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
-            new Transition(RobotState.CORAL_L2, 0.2),
-            new Transition(RobotState.CORAL_L3, 0.2),
-            new Transition(RobotState.CORAL_L4, 0.2),
-            new Transition(RobotState.CORAL_TRANSITION_OUT, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.2)));
 
         sm.addTransitions(RobotState.ALGAE_REEF_INTAKE_L3, Set.of(
-            new Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
-            new Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
-            new Transition(RobotState.CORAL_L2, 0.2),
-            new Transition(RobotState.CORAL_L3, 0.2),
-            new Transition(RobotState.CORAL_L4, 0.2),
-            new Transition(RobotState.CORAL_TRANSITION_OUT, 0.2)
-        ));
+                new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.2)));
     }
 
     public void changeState(RobotState target) {
-        if (Timer.getFPGATimestamp() < stateChangeTime + transitionDelay) {
-            return;
-        }
-        
-        if (currentPath != null && pathIndex < currentPath.size()) {
-            return;
-        }
-        
         if (target == currentState) {
             return;
         }
-        
+
+        if (targetState == target) {
+            return;
+        }
+
+        if (currentCommand != null && !currentCommand.isFinished()) {
+            currentCommand.cancel();
+        }
+
         List<RobotState> path = sm.findPath(currentState, target);
         if (path == null || path.size() < 2) {
             return;
         }
-        
-        currentPath = path;
-        pathIndex = 1;
-        executeNextTransition();
+
+        targetState = target;
+        currentCommand = createPathCommand(path);
+        CommandScheduler.getInstance().schedule(currentCommand);
     }
 
-    public void periodic() {
-        if (currentPath != null && pathIndex < currentPath.size() && 
-            Timer.getFPGATimestamp() >= stateChangeTime + transitionDelay) {
-            executeNextTransition();
-        }
-    }
+    private Command createPathCommand(List<RobotState> path) {
+        SequentialCommandGroup command = new SequentialCommandGroup();
 
-    private void executeNextTransition() {
-        RobotState nextState = currentPath.get(pathIndex);
-        Double time = sm.getTransitionTime(currentState, nextState);
-        
-        if (time == null) {
-            currentPath = null;
-            return;
+        for (int i = 1; i < path.size(); i++) {
+            RobotState nextState = path.get(i);
+            Double time = sm.getTransitionTime(path.get(i - 1), nextState);
+
+            command.addCommands(
+                    new InstantCommand(() -> {
+                        applyState(nextState);
+                        currentState = nextState;
+                    }),
+                    new WaitCommand(time != null ? time : 0.2));
         }
-        
-        applyState(nextState);
-        currentState = nextState;
-        stateChangeTime = Timer.getFPGATimestamp();
-        transitionDelay = time;
-        
-        pathIndex++;
-        if (pathIndex >= currentPath.size()) {
-            currentPath = null;
-        }
+
+        command.addCommands(new InstantCommand(() -> targetState = null));
+        return command;
     }
 
     private void applyState(RobotState state) {
@@ -175,6 +154,6 @@ public class RobotStateManager {
     }
 
     public boolean isTransitioning() {
-        return currentPath != null && pathIndex < currentPath.size();
+        return currentCommand != null && !currentCommand.isFinished();
     }
 }

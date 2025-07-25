@@ -45,10 +45,12 @@ public class RobotStateMachine {
             PathNode current = queue.poll();
 
             Set<Transition> transitions = stateGraph.get(current.state);
-            if (transitions == null) continue;
+            if (transitions == null)
+                continue;
 
             for (Transition transition : transitions) {
-                if (visited.contains(transition.target)) continue;
+                if (visited.contains(transition.target))
+                    continue;
 
                 PathNode nextNode = new PathNode(transition.target, current);
 
@@ -72,7 +74,8 @@ public class RobotStateMachine {
 
     public Double getTransitionTime(RobotState from, RobotState to) {
         Set<Transition> transitions = stateGraph.get(from);
-        if (transitions == null) return null;
+        if (transitions == null)
+            return null;
 
         for (Transition transition : transitions) {
             if (transition.target == to) {
