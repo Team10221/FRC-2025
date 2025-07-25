@@ -47,6 +47,7 @@ public class RobotContainer {
     this.stateManager = new RobotStateManager(elevator, algaeManipulator, coralManipulator);
 
     this.primary = new XboxController(ControllerConstants.PRIMARY_PORT);
+    this.secondary = new XboxController(ControllerConstants.SECONDARY_PORT);
 
     // this.autoModeSelector = new AutoModeSelector(this);
     
@@ -98,12 +99,14 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.OUTTAKE)))
       .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
 
+    /*
     new JoystickButton(primary, XboxController.Button.kX.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.INTAKE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
     new JoystickButton(primary, XboxController.Button.kY.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.RELEASE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
+    */
 
     // SECONDARY CONTROLS
     

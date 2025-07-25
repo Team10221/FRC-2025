@@ -37,15 +37,15 @@ public class RobotStateManager {
 
     public void defineTransitions() {
         sm.addTransitions(RobotState.DEFAULT, Set.of(
-                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_IN, 0.2)));
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_IN, 0.3)));
 
         sm.addTransitions(RobotState.CORAL_TRANSITION_IN, Set.of(
-                new RobotStateMachine.Transition(RobotState.DEFAULT, 0.2),
-                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.5)));
+                new RobotStateMachine.Transition(RobotState.DEFAULT, 0.15),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.15)));
 
         sm.addTransitions(RobotState.CORAL_TRANSITION_OUT, Set.of(
-                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_IN, 0.5),
-                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_IN, 0.15),
+                new RobotStateMachine.Transition(RobotState.CORAL_L2, 0.15),
                 new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
                 new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
                 new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
@@ -55,7 +55,7 @@ public class RobotStateManager {
         sm.addTransitions(RobotState.CORAL_L2, Set.of(
                 new RobotStateMachine.Transition(RobotState.CORAL_L3, 0.2),
                 new RobotStateMachine.Transition(RobotState.CORAL_L4, 0.2),
-                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.2),
+                new RobotStateMachine.Transition(RobotState.CORAL_TRANSITION_OUT, 0.15),
                 new RobotStateMachine.Transition(RobotState.ALGAE_OUTTAKE_PROCESSOR, 0.2),
                 new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L2, 0.2),
                 new RobotStateMachine.Transition(RobotState.ALGAE_REEF_INTAKE_L3, 0.2)));

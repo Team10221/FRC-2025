@@ -132,11 +132,14 @@ public final class Constants {
         public static final PID ELEVATOR_PID = new PID(0.3, 0, 0);
 
         public static enum ElevatorState {
-            // TODO: Adjust this tmrw with testing. DO NOT FORGET
-            DOWN(0), ALGAE_L2(MAX_HEIGHT * 0.25),
-            ALGAE_L3(MAX_HEIGHT * 0.6), ALGAE_PROCESSOR(0),
-            CORAL_L2(0), CORAL_L3(0),
-            CORAL_L4(0), CORAL_TRANSITION(MAX_HEIGHT * 0.15),
+            DOWN(0), 
+            ALGAE_L2(MAX_HEIGHT * 0.25),
+            ALGAE_L3(MAX_HEIGHT * 0.6),
+            ALGAE_PROCESSOR(0),
+            CORAL_L2(MAX_HEIGHT * 0.215), 
+            CORAL_L3(MAX_HEIGHT * 0.5),
+            CORAL_L4(MAX_HEIGHT * 0.8), // todo adjust 
+            CORAL_TRANSITION(MAX_HEIGHT * 0.2),
             TEST(MAX_HEIGHT * 0.85);
 
             public final double height;
@@ -169,27 +172,27 @@ public final class Constants {
                 1),
         CORAL_TRANSITION_IN(
                 ElevatorState.CORAL_TRANSITION,
-                AlgaeManipAngleState.STOW,
+                AlgaeManipAngleState.UP,
                 CoralManipAngleState.INTAKE,
                 1),
         CORAL_TRANSITION_OUT(
                 ElevatorState.CORAL_TRANSITION,
-                AlgaeManipAngleState.STOW,
+                AlgaeManipAngleState.UP,
                 CoralManipAngleState.SCORE,
                 1),
         CORAL_L2(
                 ElevatorState.CORAL_L2,
-                AlgaeManipAngleState.STOW,
+                AlgaeManipAngleState.UP,
                 CoralManipAngleState.SCORE,
                 0.4),
         CORAL_L3(
                 ElevatorState.CORAL_L3,
-                AlgaeManipAngleState.STOW,
+                AlgaeManipAngleState.UP,
                 CoralManipAngleState.SCORE,
                 0.4),
         CORAL_L4(
                 ElevatorState.CORAL_L4,
-                AlgaeManipAngleState.STOW,
+                AlgaeManipAngleState.UP,
                 CoralManipAngleState.SCORE,
                 0.2),
         ALGAE_REEF_INTAKE_L2(
