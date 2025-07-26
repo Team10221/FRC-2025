@@ -15,6 +15,7 @@ import frc.lib.util.PID;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipAngleState;
 import frc.robot.Constants.CoralManipConstants.CoralManipAngleState;
 import frc.robot.Constants.ElevatorConstants.ElevatorState;
+import frc.robot.subsystems.VisionSubsystem.CameraConfiguration;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -30,13 +31,10 @@ import frc.robot.Constants.ElevatorConstants.ElevatorState;
  */
 public final class Constants {
     public final class VisionSubsystemConstants {
-        // transform = transformation from robot center to camera location
-        public static record CameraConfiguration(String name, Transform3d transform) {
-        }
-
-        public static AprilTagFields SELECTED_FIELD = AprilTagFields.kDefaultField; // "k2025ReefscapeWelded"
+        public static record CameraConfiguration(String name, Transform3d transform) {}
+        public static AprilTagFields SELECTED_FIELD = AprilTagFields.k2025ReefscapeWelded;
         public static final CameraConfiguration[] CAMERAS = {
-                new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d()) // (main) camera, probably lol
+            new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d())
         };
     }
 
@@ -107,7 +105,7 @@ public final class Constants {
         }
 
         public static enum CoralManipState {
-            REST(0), INTAKE(-0.33), OUTTAKE(0.6);
+            REST(0), INTAKE(-0.5), OUTTAKE(0.7);
 
             public final double speed;
 

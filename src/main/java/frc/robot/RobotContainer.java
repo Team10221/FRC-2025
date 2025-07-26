@@ -2,7 +2,10 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -15,7 +18,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.RobotState;
-import frc.robot.auto.AutoModeSelector;
+import frc.robot.auto.AutoPrimitives;
+import frc.robot.auto.Autos;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
 import frc.robot.Constants.CoralManipConstants.CoralManipState;
 import frc.robot.other.RobotStateManager;
@@ -27,12 +31,10 @@ public class RobotContainer {
   public AlgaeManipulator algaeManipulator;
   public CoralManipulator coralManipulator;
   public RobotStateManager stateManager;
-  private AutoModeSelector autoModeSelector;
+  private Autos autos;
 
-  public XboxController primary;
+  public PS4Controller primary;
   public XboxController secondary;
-
-  // private AutoModeSelector autoModeSelector;
 
   public RobotContainer() {
     try { this.swerve = new SwerveSubsystem(); }
@@ -47,11 +49,16 @@ public class RobotContainer {
     this.coralManipulator = new CoralManipulator();
     this.algaeManipulator = new AlgaeManipulator();
 
-    this.autoModeSelector = new AutoModeSelector(this);
     this.stateManager = new RobotStateManager(elevator, algaeManipulator, coralManipulator);
 
-    this.primary = new XboxController(ControllerConstants.PRIMARY_PORT);
+    this.primary = new PS4Controller(ControllerConstants.PRIMARY_PORT);
     this.secondary = new XboxController(ControllerConstants.SECONDARY_PORT);
+
+    this.autos = new Autos(this);
+    autos.add("Leave", c -> AutoPrimitives.timedDrive(c, -1.0, 0.0, 0.0, 5.0));
+    autos.add("Vision Coral", c -> AutoPrimitives.coralVision(c, currentAlliance() == Alliance.Blue ? 21 : 10));
+    autos.add("Simple Coral", c -> AutoPrimitives.coralBasic(c));
+    autos.publish();
 
     // this.autoModeSelector = new AutoModeSelector(this);
     
@@ -75,7 +82,7 @@ public class RobotContainer {
 
           xSpeed *= swerve.getMaxSpeed() * mul;
           ySpeed *= swerve.getMaxSpeed() * mul;
-          rotSpeed *= ControllerConstants.ROTATION_SPEED * mul;
+          rotSpeed *= ControllerConstants.ROTATION_SPEED; // rotation shouldnt be affected by drive speed multiplier
 
           swerve.drive(
             new Translation2d(xSpeed, ySpeed), 
@@ -91,9 +98,6 @@ public class RobotContainer {
   private void configureBindings() {
     // PRIMARY CONTROLS
 
-    // I want primary left bumper 1 (lb) to intake coral, primary right bumper 1 to outake coral (the gamepad equivbalent of the ps4 binding)
-    // I want primary left bumper 2 (lt) to intake algae, primary right bumper 2 to outake coral
-    
     /*
     new JoystickButton(primary, XboxController.Button.kLeftBumper.value)
       .whileTrue(new RunCommand(() -> swerve.lockPose()));
@@ -114,10 +118,10 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.RELEASE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE))); */
 
-    new JoystickButton(primary, XboxController.Button.kLeftBumper.value)
+    new JoystickButton(primary, PS4Controller.Button.kL1.value)
       .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.INTAKE)))
       .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
-    new JoystickButton(primary, XboxController.Button.kRightBumper.value)
+    new JoystickButton(primary, PS4Controller.Button.kR1.value)
       .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.OUTTAKE)))
       .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
     
@@ -130,9 +134,9 @@ public class RobotContainer {
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
     */
     
-    new JoystickButton(primary, XboxController.Button.kA.value)
+    new JoystickButton(primary, PS4Controller.Button.kCross.value)
       .whileTrue(new RunCommand(() -> swerve.lockPose()));
-    new JoystickButton(primary, XboxController.Button.kB.value)
+    new JoystickButton(primary, PS4Controller.Button.kCircle.value)
       .onTrue(new InstantCommand(() -> swerve.zeroGyro()));
 
     // SECONDARY CONTROLS
@@ -156,7 +160,9 @@ public class RobotContainer {
     */
   }
 
-  public Command getAutonomousCommand() {
-    return autoModeSelector.getAutonomousCommand();
+  public Command getAutonomousCommand() { return autos.selected(); }
+
+  private static Alliance currentAlliance() {
+    return DriverStation.getAlliance().orElse(Alliance.Red);
   }
 }
