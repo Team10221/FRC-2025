@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -14,6 +15,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.RobotState;
+import frc.robot.auto.AutoModeSelector;
 import frc.robot.Constants.AlgaeManipConstants.AlgaeManipState;
 import frc.robot.Constants.CoralManipConstants.CoralManipState;
 import frc.robot.other.RobotStateManager;
@@ -25,6 +27,7 @@ public class RobotContainer {
   public AlgaeManipulator algaeManipulator;
   public CoralManipulator coralManipulator;
   public RobotStateManager stateManager;
+  private AutoModeSelector autoModeSelector;
 
   public XboxController primary;
   public XboxController secondary;
@@ -44,6 +47,7 @@ public class RobotContainer {
     this.coralManipulator = new CoralManipulator();
     this.algaeManipulator = new AlgaeManipulator();
 
+    this.autoModeSelector = new AutoModeSelector(this);
     this.stateManager = new RobotStateManager(elevator, algaeManipulator, coralManipulator);
 
     this.primary = new XboxController(ControllerConstants.PRIMARY_PORT);
@@ -57,7 +61,7 @@ public class RobotContainer {
       new RunCommand(
         () -> {
           // get speeds & apply deadbands
-          double xSpeed = -MathUtil.applyDeadband(primary.getLeftY(), ControllerConstants.DEADBAND);
+          double xSpeed = -MathUtil.applyDeadband(primary.getLeftY(), ControllerConstants.DEADBAND); // TODO fix
           double ySpeed = -MathUtil.applyDeadband(primary.getLeftX(), ControllerConstants.DEADBAND);
           double rotSpeed = -MathUtil.applyDeadband(primary.getRightX(), ControllerConstants.DEADBAND);
 
@@ -87,6 +91,10 @@ public class RobotContainer {
   private void configureBindings() {
     // PRIMARY CONTROLS
 
+    // I want primary left bumper 1 (lb) to intake coral, primary right bumper 1 to outake coral (the gamepad equivbalent of the ps4 binding)
+    // I want primary left bumper 2 (lt) to intake algae, primary right bumper 2 to outake coral
+    
+    /*
     new JoystickButton(primary, XboxController.Button.kLeftBumper.value)
       .whileTrue(new RunCommand(() -> swerve.lockPose()));
     new JoystickButton(primary, XboxController.Button.kRightBumper.value)
@@ -99,36 +107,56 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.OUTTAKE)))
       .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
 
-    /*
     new JoystickButton(primary, XboxController.Button.kX.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.INTAKE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
     new JoystickButton(primary, XboxController.Button.kY.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.RELEASE)))
+      .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE))); */
+
+    new JoystickButton(primary, XboxController.Button.kLeftBumper.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.INTAKE)))
+      .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
+    new JoystickButton(primary, XboxController.Button.kRightBumper.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.OUTTAKE)))
+      .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
+    
+    /*
+    new Trigger(() -> primary.getLeftTriggerAxis() > 0.5)
+      .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.INTAKE)))
+      .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
+    new Trigger(() -> primary.getRightTriggerAxis() > 0.5)
+      .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.RELEASE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE)));
     */
+    
+    new JoystickButton(primary, XboxController.Button.kA.value)
+      .whileTrue(new RunCommand(() -> swerve.lockPose()));
+    new JoystickButton(primary, XboxController.Button.kB.value)
+      .onTrue(new InstantCommand(() -> swerve.zeroGyro()));
 
     // SECONDARY CONTROLS
     
     new JoystickButton(secondary, XboxController.Button.kA.value)
       .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.DEFAULT)));
-    new JoystickButton(secondary, XboxController.Button.kB.value)
-      .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.CORAL_L2)));
     new JoystickButton(secondary, XboxController.Button.kX.value)
-      .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.CORAL_L3)));
+      .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.CORAL_L2)));
     new JoystickButton(secondary, XboxController.Button.kY.value)
+      .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.CORAL_L3)));
+    new JoystickButton(secondary, XboxController.Button.kB.value)
       .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.CORAL_L4)));
 
+    /*
     new Trigger(() -> secondary.getPOV() == 0)
       .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.ALGAE_REEF_INTAKE_L2)));
     new Trigger(() -> secondary.getPOV() == 90)
       .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.ALGAE_REEF_INTAKE_L3)));
     new Trigger(() -> secondary.getPOV() == 180)
       .onTrue(new InstantCommand(() -> stateManager.changeState(RobotState.ALGAE_OUTTAKE_PROCESSOR)));
+    */
   }
 
-  /*
   public Command getAutonomousCommand() {
     return autoModeSelector.getAutonomousCommand();
-  } */
+  }
 }

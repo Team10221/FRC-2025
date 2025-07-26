@@ -64,7 +64,7 @@ public final class Constants {
         public static final PID ANGLE_MOTOR_PID = new PID(0.05, 0, 0.01);
 
         public static enum AlgaeManipAngleState {
-            UP(-10), STOW(-70), OUT(-90);
+            UP(-10), STOW(-70), OUT(-135);
 
             public final double position;
 
@@ -74,7 +74,7 @@ public final class Constants {
         }
 
         public static enum AlgaeManipState {
-            IDLE(0, 0), INTAKE(0.8, -0.8), RELEASE(-0.5, 0.5);
+            IDLE(0, 0), INTAKE(0.6, -0.6), RELEASE(-0.5, 0.5);
 
             public final double leftMotorSpeed, rightMotorSpeed;
 
@@ -97,7 +97,7 @@ public final class Constants {
         public static final PID ANGLE_MOTOR_PID = new PID(0.04, 0, 0.001);
 
         public static enum CoralManipAngleState {
-            INTAKE(0), SCORE(-150); // -155 probably works too
+            INTAKE(0), SCORE(-165); // -155 probably works too
 
             public final double pos;
 
@@ -133,12 +133,13 @@ public final class Constants {
 
         public static enum ElevatorState {
             DOWN(0), 
-            ALGAE_L2(MAX_HEIGHT * 0.25),
-            ALGAE_L3(MAX_HEIGHT * 0.6),
+            ALGAE_L2(MAX_HEIGHT * 0.23),
+            ALGAE_L3(MAX_HEIGHT * 0.7),
             ALGAE_PROCESSOR(0),
-            CORAL_L2(MAX_HEIGHT * 0.215), 
-            CORAL_L3(MAX_HEIGHT * 0.5),
-            CORAL_L4(MAX_HEIGHT * 0.8), // todo adjust 
+            CORAL_L1(MAX_HEIGHT * 0.2),
+            CORAL_L2(MAX_HEIGHT * 0.24), 
+            CORAL_L3(MAX_HEIGHT * 0.53),
+            CORAL_L4(MAX_HEIGHT * 0.97), // todo adjust 
             CORAL_TRANSITION(MAX_HEIGHT * 0.2),
             TEST(MAX_HEIGHT * 0.85);
 
@@ -180,11 +181,16 @@ public final class Constants {
                 AlgaeManipAngleState.UP,
                 CoralManipAngleState.SCORE,
                 1),
+        CORAL_L1(
+                ElevatorState.CORAL_L1,
+                AlgaeManipAngleState.UP,
+                CoralManipAngleState.SCORE,
+                0.8),
         CORAL_L2(
                 ElevatorState.CORAL_L2,
                 AlgaeManipAngleState.UP,
                 CoralManipAngleState.SCORE,
-                0.4),
+                0.6),
         CORAL_L3(
                 ElevatorState.CORAL_L3,
                 AlgaeManipAngleState.UP,
@@ -198,7 +204,7 @@ public final class Constants {
         ALGAE_REEF_INTAKE_L2(
                 ElevatorState.ALGAE_L2,
                 AlgaeManipAngleState.OUT,
-                CoralManipAngleState.INTAKE,
+                CoralManipAngleState.SCORE,
                 0.6),
         ALGAE_REEF_INTAKE_L3(
                 ElevatorState.ALGAE_L3,
