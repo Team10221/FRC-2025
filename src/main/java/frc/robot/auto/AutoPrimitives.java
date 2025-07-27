@@ -105,15 +105,15 @@ public final class AutoPrimitives {
     );
   }
 
-  public static Command coralBasic(RobotContainer c) {
+  public static Command coralBasic(RobotContainer c) { // no idea if this'll work!!!
     return Commands.sequence(
-      timedDrive(c, 0.5, 0, 0, 3),
+      goTo(c, -(2.24-0.3556)/2, 0),
       new InstantCommand(() -> c.stateManager.changeState(RobotState.CORAL_L3)),
-      timedDrive(c, 0.25, 0, 0, 4),
+      goTo(c, -(2.24-0.3556), 0),
       new InstantCommand(() -> c.coralManipulator.setState(CoralManipState.OUTTAKE)),
       new WaitCommand(0.8),
       new InstantCommand(() -> c.coralManipulator.setState(CoralManipState.REST)),
-      timedDrive(c, -1, 0, 0, 2),
+      goTo(c, 0.5, 0),
       new InstantCommand(() -> c.stateManager.changeState(RobotState.DEFAULT))
     );
   }

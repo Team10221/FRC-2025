@@ -133,7 +133,7 @@ public final class Constants {
 
         public static enum ElevatorState {
             DOWN(0), 
-            ALGAE_L2(MAX_HEIGHT * 0.46206896551),
+            ALGAE_L2(MAX_HEIGHT * 0.46206896551), // useless fucking constants
             ALGAE_L3(MAX_HEIGHT * 0.7448275862),
             ALGAE_PROCESSOR(0),
             CORAL_L1(MAX_HEIGHT * 0.2),

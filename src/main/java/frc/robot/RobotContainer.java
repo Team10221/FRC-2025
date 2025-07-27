@@ -56,8 +56,8 @@ public class RobotContainer {
 
     this.autos = new Autos(this);
     autos.add("Leave", c -> AutoPrimitives.timedDrive(c, -1.0, 0.0, 0.0, 5.0));
-    autos.add("Vision Coral", c -> AutoPrimitives.coralVision(c, currentAlliance() == Alliance.Blue ? 21 : 10));
-    autos.add("Simple Coral", c -> AutoPrimitives.coralBasic(c));
+    // autos.add("Vision Coral", c -> AutoPrimitives.coralVision(c, currentAlliance() == Alliance.Blue ? 21 : 10));
+    autos.add("Simple Coral (MAY NOT WORK)", c -> AutoPrimitives.coralBasic(c));
     autos.publish();
 
     // this.autoModeSelector = new AutoModeSelector(this);
