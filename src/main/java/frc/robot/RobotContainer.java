@@ -68,7 +68,7 @@ public class RobotContainer {
       new RunCommand(
         () -> {
           // get speeds & apply deadbands
-          double xSpeed = -MathUtil.applyDeadband(primary.getLeftY(), ControllerConstants.DEADBAND); // TODO fix
+          double xSpeed = -MathUtil.applyDeadband(primary.getLeftY(), ControllerConstants.DEADBAND);
           double ySpeed = -MathUtil.applyDeadband(primary.getLeftX(), ControllerConstants.DEADBAND);
           double rotSpeed = -MathUtil.applyDeadband(primary.getRightX(), ControllerConstants.DEADBAND);
 
@@ -117,6 +117,13 @@ public class RobotContainer {
     new JoystickButton(primary, XboxController.Button.kY.value)
       .onTrue(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.RELEASE)))
       .onFalse(new InstantCommand(() -> algaeManipulator.setState(AlgaeManipState.IDLE))); */
+
+    new JoystickButton(primary, PS4Controller.Button.kL1.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.INTAKE)))
+      .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
+    new JoystickButton(primary, PS4Controller.Button.kR1.value)
+      .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.OUTTAKE)))
+      .onFalse(new InstantCommand(() -> coralManipulator.setState(CoralManipState.REST)));
 
     new JoystickButton(primary, PS4Controller.Button.kL1.value)
       .onTrue(new InstantCommand(() -> coralManipulator.setState(CoralManipState.INTAKE)))

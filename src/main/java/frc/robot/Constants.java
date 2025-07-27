@@ -8,7 +8,9 @@ import java.io.File;
 import java.util.List;
 
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.lib.util.PID;
@@ -34,7 +36,7 @@ public final class Constants {
         public static record CameraConfiguration(String name, Transform3d transform) {}
         public static AprilTagFields SELECTED_FIELD = AprilTagFields.k2025ReefscapeWelded;
         public static final CameraConfiguration[] CAMERAS = {
-            new CameraConfiguration("Arducam_OV9281_USB_Camera", new Transform3d())
+                new CameraConfiguration("Arducam_OV9281_USB_Camera (1)", new Transform3d(new Translation3d(26.935 * 100, -10.824 * 100, (40.630 + 2.858) * 100), new Rotation3d())) // (main) camera, probably lol
         };
     }
 
@@ -131,8 +133,8 @@ public final class Constants {
 
         public static enum ElevatorState {
             DOWN(0), 
-            ALGAE_L2(MAX_HEIGHT * 0.23),
-            ALGAE_L3(MAX_HEIGHT * 0.7),
+            ALGAE_L2(MAX_HEIGHT * 0.46206896551),
+            ALGAE_L3(MAX_HEIGHT * 0.7448275862),
             ALGAE_PROCESSOR(0),
             CORAL_L1(MAX_HEIGHT * 0.2),
             CORAL_L2(MAX_HEIGHT * 0.24), 
