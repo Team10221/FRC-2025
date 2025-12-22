@@ -51,8 +51,4 @@ public class Elevator extends Subsystem<Double> {
         return Math.abs(currentHeight - targetHeight) < ElevatorConstants.TOLERANCE;
     }
 
-    public void stop() {
-        leaderMotor.stop();
-        followerMotor.stop();
-    }
 }

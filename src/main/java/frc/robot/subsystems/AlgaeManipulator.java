@@ -49,9 +49,4 @@ public class AlgaeManipulator extends Subsystem<Double> {
     return (degrees / 360) * AlgaeManipConstants.GEAR_RATIO;
   }
 
-  public void stop() {
-    leftMotor.stop();
-    rightMotor.stop();
-    angleMotor.stop();
-  }
 }
