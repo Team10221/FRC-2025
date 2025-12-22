@@ -20,6 +20,7 @@ public interface MotorAdapter<T> {
     boolean isInverted();
     T getMotorController();
     default void useExternalEncoder() {};
+    default void disableSoftLimits() {}
     default void setBrakeMode() {};
     default void setCoastMode() {};
 }

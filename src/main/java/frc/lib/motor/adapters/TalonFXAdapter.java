@@ -92,6 +92,14 @@ public class TalonFXAdapter implements MotorAdapter<TalonFX> {
     setBackLimit(back);
   }
 
+  @Override
+  public void disableSoftLimits() {
+    SoftwareLimitSwitchConfigs configs = new SoftwareLimitSwitchConfigs();
+    configs.ForwardSoftLimitEnable = false;
+    configs.ReverseSoftLimitEnable = false;
+    motor.getConfigurator().apply(configs);
+  }
+
   public void resetEncoder() {
     motor.setPosition(0);
   }

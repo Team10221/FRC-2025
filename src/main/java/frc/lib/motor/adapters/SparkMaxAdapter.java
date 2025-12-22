@@ -127,4 +127,13 @@ public class SparkMaxAdapter implements MotorAdapter<SparkMax> {
   public void setCoastMode() {
     configure(new SparkMaxConfig().idleMode(IdleMode.kCoast));
   }
+
+  @Override
+  public void disableSoftLimits() {
+    configure(new SparkMaxConfig().apply(
+      new SoftLimitConfig()
+        .forwardSoftLimitEnabled(false)
+        .reverseSoftLimitEnabled(false)
+    ));
+  }
 }

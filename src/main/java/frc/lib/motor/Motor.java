@@ -355,6 +355,26 @@ public class Motor {
   }
 
   /**
+   * Resets the motor's encoder.
+   * 
+   * @return The motor object, allowing for method chaining.
+   */
+  public Motor resetEncoder() {
+    adapter.resetEncoder();
+    return this;
+  }
+
+  /**
+   * Disables the motor's software limits.
+   * 
+   * @return The motor object, allowing for method chaining.
+   */
+  public Motor disableSoftLimits() {
+    adapter.disableSoftLimits();
+    return this;
+  }
+
+  /**
    * Uses a connected external encoder (in the case of REV Robotics motor controllers).
    * 
    * @return The motor object, allowing for method chaining.
