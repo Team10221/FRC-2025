@@ -33,6 +33,6 @@ public class CoralManipulator extends Subsystem<Double> {
     }
 
     private double degreesToRotations(double degrees) {
-        return (degrees / 360) * AlgaeManipConstants.GEAR_RATIO;
+        return (degrees / 360) * CoralManipConstants.GEAR_RATIO;
     } 
 }
