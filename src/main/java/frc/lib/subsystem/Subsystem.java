@@ -19,9 +19,7 @@ public abstract class Subsystem<T> extends SubsystemBase {
     private final Map<Class<? extends Enum<?>>, Map<Enum<?>, Map<Integer, T>>> hooks;
     private final Map<Class<? extends Enum<?>>, Mutable<T>> values;
     private final Map<Class<? extends Enum<?>>, Enum<?>> states;
-
-    private final List<Motor> motors;
-    private boolean motorsInitialized = false;
+    private List<Motor> motors;
 
     /**
      * Constructs a Subsystem with initial states and values for the given enum
@@ -34,7 +32,6 @@ public abstract class Subsystem<T> extends SubsystemBase {
         this.hooks = new HashMap<>();
         this.values = new HashMap<>();
         this.states = new HashMap<>();
-        this.motors = new ArrayList<>();
 
         for (Class<? extends Enum<?>> clazz : enumClasses) {
             values.put(clazz, translate(clazz));
@@ -317,34 +314,30 @@ public abstract class Subsystem<T> extends SubsystemBase {
         });
     }
 
-    private void discoverMotors() {
-        if (motorsInitialized) return;
-
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (Motor.class.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
-                try {
-                    Motor motor = (Motor) field.get(this);
-                    if (motor != null) {
-                        motors.add(motor);
-                    }
-                } catch (IllegalAccessException e) {
-                    System.err.println("Error accessing field: " + field.getName());
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        motorsInitialized = true;
-        System.out.println("[" + getName() + "] Discovered " + motors.size() + " motor(s) on initialization");
-    }
-
     /**
      * Gets the list of motors in the subsystem, for use by the subclass.
+     * Also used for initializing the motors list.
      * 
      * @return The list of motors in the subsystem.
      */
     protected List<Motor> getMotors() {
+        if (motors == null) {
+            motors = new ArrayList<>();
+            for (Field field : this.getClass().getDeclaredFields()) {
+                if (Motor.class.isAssignableFrom(field.getType())) {
+                    field.setAccessible(true);
+                    try {
+                        Motor motor = (Motor) field.get(this);
+                        if (motor != null) {
+                            motors.add(motor);
+                        }
+                    } catch (IllegalAccessException e) {
+                        System.err.println("Error accessing field: " + field.getName());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
         return motors;
     }
 
@@ -366,7 +359,7 @@ public abstract class Subsystem<T> extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        discoverMotors();
+        getMotors();
         updateMotors();
         updateSmartDashboard();
     }
@@ -375,8 +368,6 @@ public abstract class Subsystem<T> extends SubsystemBase {
      * Stops all motors in the subsystem.
      */
     public void stopMotors() {
-        for (Motor motor : motors) {
-            motor.stop();
-        }
+        getMotors().forEach(Motor::stop);
     }
 }
